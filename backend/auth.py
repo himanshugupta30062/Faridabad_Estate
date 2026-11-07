@@ -6,7 +6,7 @@ import bcrypt
 import httpx
 import jwt
 from fastapi import APIRouter, HTTPException, Request, Response
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, Field
 
 from db import db
 
@@ -66,6 +66,13 @@ async def _user_from_session_token(token: str):
 
 
 async def get_current_admin(request: Request) -> dict:
+    user = await get_current_user(request)
+    if user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admin access only")
+    return user
+
+
+async def get_current_user(request: Request) -> dict:
     access = request.cookies.get("access_token")
     session_token = request.cookies.get("session_token")
     bearer = request.headers.get("Authorization", "")
@@ -85,9 +92,26 @@ async def get_current_admin(request: Request) -> dict:
             user = await _user_from_session_token(tok)
     if not user:
         raise HTTPException(status_code=401, detail="Not authenticated")
-    if user.get("role") != "admin":
-        raise HTTPException(status_code=403, detail="Admin access only")
     return user
+
+
+class RegisterIn(BaseModel):
+    name: str = Field(min_length=2, max_length=80)
+    email: EmailStr
+    password: str = Field(min_length=8, max_length=128)
+
+
+@router.post("/register")
+async def register(body: RegisterIn, response: Response):
+    email = body.email.lower()
+    if await db.users.find_one({"email": email}):
+        raise HTTPException(status_code=409, detail="An account with this email already exists. Please sign in.")
+    user = {"user_id": f"user_{uuid.uuid4().hex[:12]}", "email": email, "name": body.name.strip(),
+            "password_hash": hash_password(body.password), "role": "visitor", "created_at": datetime.now(timezone.utc)}
+    await db.users.insert_one(dict(user))
+    set_cookie(response, "access_token", create_access_token(user["user_id"], email), 900)
+    set_cookie(response, "refresh_token", create_refresh_token(user["user_id"]), 604800)
+    return public_user(user)
 
 
 class LoginIn(BaseModel):
@@ -170,7 +194,7 @@ async def google_session(body: SessionIn, response: Response):
 
 @router.get("/me")
 async def me(request: Request):
-    return public_user(await get_current_admin(request))
+    return public_user(await get_current_user(request))
 
 
 @router.post("/logout")

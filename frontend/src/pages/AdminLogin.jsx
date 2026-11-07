@@ -14,7 +14,7 @@ export default function AdminLogin() {
   const [busy, setBusy] = useState(false);
 
   useEffect(() => { if (location.state?.error) window.history.replaceState({}, ""); }, [location.state]);
-  if (user) return <Navigate to="/admin" replace />;
+  if (user?.role === "admin") return <Navigate to="/admin" replace />;
 
   const submit = async (e) => {
     e.preventDefault();
@@ -23,6 +23,10 @@ export default function AdminLogin() {
     setError("");
     try {
       const { data } = await api.post("/auth/login", { email, password });
+      if (data.role !== "admin") {
+        await api.post("/auth/logout");
+        throw new Error("This account does not have admin access.");
+      }
       setUser(data);
     } catch (err) {
       setError(formatApiError(err));

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { LogOut, ExternalLink } from "lucide-react";
+import { LogOut, ExternalLink, Download } from "lucide-react";
 import { toast } from "sonner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { api, formatApiError } from "@/lib/api";
@@ -29,10 +29,22 @@ export default function AdminDashboard() {
   }, [filter, q]);
 
   useEffect(() => { loadStats(); loadListings(); }, [loadStats, loadListings]);
+
+  const exportCsv = async () => {
+    try {
+      const { data } = await api.get("/admin/export/leads.csv", { responseType: "blob" });
+      const url = URL.createObjectURL(data);
+      const a = Object.assign(document.createElement("a"), { href: url, download: `propmitra-enquiries-${new Date().toISOString().slice(0, 10)}.csv` });
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (e) {
+      toast.error(formatApiError(e));
+    }
+  };
   useEffect(() => { const t = setTimeout(loadLeads, 250); return () => clearTimeout(t); }, [loadLeads]);
 
   return (
-    <div className="min-h-screen bg-[#0F0F12] text-white" data-testid="admin-dashboard">
+    <div className="dark min-h-screen bg-[#0F0F12] text-white" data-testid="admin-dashboard">
       <header className="sticky top-0 z-40 backdrop-blur-md bg-[#0F0F12]/85 border-b border-white/10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -46,7 +58,10 @@ export default function AdminDashboard() {
         </div>
       </header>
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 py-8 sm:py-10">
-        <h1 className="font-serif text-3xl sm:text-4xl">Dashboard</h1>
+        <div className="flex items-center justify-between gap-4">
+          <h1 className="font-serif text-3xl sm:text-4xl">Dashboard</h1>
+          <button onClick={exportCsv} className="text-sm border border-white/15 rounded-full px-4 py-2 flex items-center gap-2 hover:border-[#D4AF37]" data-testid="admin-export-csv"><Download className="w-4 h-4" />Export enquiries</button>
+        </div>
         <Tabs defaultValue="overview" className="mt-6">
           <TabsList className="bg-[#1A1A22] border border-white/10">
             <TabsTrigger value="overview" data-testid="admin-tab-overview">Overview</TabsTrigger>

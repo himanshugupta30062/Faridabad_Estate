@@ -1,3 +1,4 @@
+import asyncio
 import json
 import os
 import re
@@ -11,6 +12,7 @@ from pydantic import BaseModel, Field
 from emergentintegrations.llm.chat import LlmChat, UserMessage, TextDelta, StreamDone
 
 from db import db
+from emailer import send_lead_alert
 
 router = APIRouter(prefix="/api")
 log = logging.getLogger("chat")
@@ -65,8 +67,11 @@ property_type: "Apartment" | "Villa" | "Independent House" | "Plot" | null (flat
 bedrooms: integer or null
 possession: "Ready to move" | "Under construction" | "Any" | null
 name: string or null; phone: string or null (exactly as visitor typed)
+handoff: true if the visitor asks to talk to a human, agent, advisor or a real person, else false
 temperature: "Hot" | "Warm" | "Cold". Hot = clear intent, budget and location given, shares contact and wants to proceed soon (site visit, ready to move, urgent). Warm = some requirements clear but undecided or no urgency. Cold = vague, just browsing, or refuses details.
 summary: 2-3 short sentences summarising the visitor's requirement and stage for a sales advisor. Only facts stated by the visitor.
+Locations: map Hyderabad spellings/abbreviations to the standard locality name (e.g. "FD", "Fin District" => "Financial District", "Hitech city" => "HITEC City"). "near X" => ["X"].
+Intent: if the visitor gives a monthly amount or says rent/rental/lease => "rent"; if they mention lakh/crore purchase budget or buying => "buy"; if they want to sell/list their property => "sell".
 Only use what the visitor actually said. Never guess."""
 
 REPLY_RULES = """You are Property Mitra, the friendly AI property advisor of UrbanNest Properties, a real estate consultancy in Hyderabad.
@@ -74,7 +79,7 @@ Goal: understand the visitor's requirement, recommend matching listings, and col
 Conversation flow (ask at most 1-2 things per message, keep replies under 90 words, warm Indian English, use lakh/crore):
 1. Ask if they want to Buy, Rent or Sell.
 2. Collect preferred location, budget, property type, bedrooms and possession preference (ready to move / under construction). For Sell, collect location, property type, bedrooms and expected price.
-3. When MATCHING_LISTINGS has items, briefly recommend them by title (they are shown as cards below your message).
+3. When MATCHING_LISTINGS has items, recommend them by title and briefly explain why each matches using its "reasons" (they are shown as cards with links below your message). Offer to refine (budget, area, BHK).
 4. If search was done and there are no matches, say honestly that no current listing matches and offer a callback from an UrbanNest advisor.
 5. Ask for name and 10-digit mobile number so an advisor can call back. Once LEAD_SAVED is true, thank them and confirm an advisor will contact them soon.
 STRICT RULES:
@@ -83,6 +88,7 @@ STRICT RULES:
 - All listings shown are sample listings for demonstration.
 - Do not process payments, legal verification or transactions.
 - If MATCHING_LISTINGS is [] (an empty list), immediately and honestly say no current listing matches, then offer a callback and ask for name and phone (or suggest relaxing budget/location).
+- If HANDOFF_REQUESTED is true: confirm an UrbanNest human advisor will take over and call them; ask for name and phone if missing.
 - Greet only once; never restart with "Namaste" or re-introduce yourself mid-conversation.
 - Never ask again for anything already in COLLECTED, and do not ask about preferences that a recommended listing already answers.
 - Do not output JSON or markdown tables. Plain text with short line breaks only."""
@@ -97,7 +103,7 @@ async def extract_requirements(transcript: str) -> dict:
 
 def merge_requirements(old: dict, new: dict) -> dict:
     out = dict(old)
-    for k in REQ_KEYS + ["temperature", "summary"]:
+    for k in REQ_KEYS + ["temperature", "summary", "handoff"]:
         v = new.get(k)
         if v not in (None, "", []):
             out[k] = v
@@ -105,20 +111,23 @@ def merge_requirements(old: dict, new: dict) -> dict:
 
 
 def public_property(p: dict) -> dict:
-    return {k: p.get(k) for k in ["id", "title", "listing_type", "location", "property_type", "bedrooms", "bathrooms",
-                                  "area_sqft", "price", "possession", "image_url", "description", "is_sample"]}
+    return {k: p.get(k) for k in ["id", "slug", "title", "listing_type", "location", "property_type", "bedrooms", "bathrooms",
+                                  "area_sqft", "price", "possession", "furnishing", "image_url", "images", "highlights",
+                                  "latitude", "longitude", "description", "is_sample", "created_at"]}
 
 
 async def find_matches(req: dict, limit: int = 4):
     intent = req.get("intent")
-    if intent not in ("buy", "rent") or not req.get("locations") or not req.get("budget_max"):
+    known = sum(bool(req.get(k)) for k in ["locations", "budget_max", "property_type", "bedrooms"])
+    if intent not in ("buy", "rent") or known < 2:
         return None
     q = {"is_active": True, "listing_type": intent}
-    q["$or"] = [{"location": {"$regex": f"^{re.escape(loc.strip())}$", "$options": "i"}} for loc in req["locations"]]
-    price = {"$lte": float(req["budget_max"])}
-    if req.get("budget_min"):
-        price["$gte"] = float(req["budget_min"])
-    q["price"] = price
+    if req.get("locations"):
+        q["$or"] = [{"location": {"$regex": f"^{re.escape(loc.strip())}$", "$options": "i"}} for loc in req["locations"]]
+    if req.get("budget_max"):
+        q["price"] = {"$lte": float(req["budget_max"])}
+        if req.get("budget_min"):
+            q["price"]["$gte"] = float(req["budget_min"])
     if req.get("property_type"):
         q["property_type"] = req["property_type"]
     if req.get("bedrooms"):
@@ -126,7 +135,22 @@ async def find_matches(req: dict, limit: int = 4):
     if req.get("possession") in ("Ready to move", "Under construction"):
         q["possession"] = req["possession"]
     docs = await db.properties.find(q, {"_id": 0}).sort("price", 1).to_list(limit)
-    return [public_property(d) for d in docs]
+    return [{**public_property(d), "reasons": match_reasons(d, req)} for d in docs]
+
+
+def match_reasons(p, req):
+    r = []
+    if req.get("locations"):
+        r.append(f"In {p['location']}, your preferred area")
+    if req.get("budget_max"):
+        r.append(f"{fmt_price(p['price'], p['listing_type'])} is within your budget of up to {fmt_price(req['budget_max'], p['listing_type'])}")
+    if req.get("bedrooms"):
+        r.append(f"{p['bedrooms']} BHK as requested")
+    if req.get("property_type"):
+        r.append(f"{p['property_type']} as requested")
+    if req.get("possession") in ("Ready to move", "Under construction"):
+        r.append(f"Possession: {p.get('possession')}")
+    return r
 
 
 def whatsapp_message(lead: dict, matches: list) -> str:
@@ -173,11 +197,17 @@ def transcript_text(messages):
 
 class ChatIn(BaseModel):
     session_id: str | None = None
+    source_page: str | None = Field(default=None, max_length=200)
     message: str = Field(min_length=1, max_length=1500)
 
 
 GREETING = ("Namaste! I'm Property Mitra, your AI property advisor from UrbanNest Properties. "
             "Are you looking to Buy, Rent or Sell a property in Hyderabad?")
+
+
+@router.get("/chat/status")
+async def chat_status():
+    return {"configured": bool(os.environ.get("EMERGENT_LLM_KEY"))}
 
 
 @router.get("/chat/{session_id}")
@@ -194,11 +224,13 @@ async def chat_stream(body: ChatIn):
     text = body.message.strip()
     if not text:
         raise HTTPException(status_code=422, detail="Message cannot be empty")
+    if not os.environ.get("EMERGENT_LLM_KEY"):
+        raise HTTPException(status_code=503, detail="Property Mitra is not configured yet. Please contact UrbanNest directly.")
     sid = body.session_id or f"chat_{uuid.uuid4().hex}"
     s = await db.chat_sessions.find_one({"session_id": sid}, {"_id": 0})
     if not s:
         s = {"session_id": sid, "messages": [{"role": "assistant", "content": GREETING, "ts": now_iso()}],
-             "requirements": {}, "matches": [], "lead_id": None, "created_at": now_iso()}
+             "requirements": {}, "matches": [], "lead_id": None, "created_at": now_iso(), "source_page": body.source_page}
         await db.chat_sessions.insert_one(dict(s))
     messages = s["messages"] + [{"role": "user", "content": text, "ts": now_iso()}]
     transcript = transcript_text(messages)
@@ -222,7 +254,7 @@ async def chat_stream(body: ChatIn):
     match_info = ("NOT_SEARCHED_YET (need intent buy/rent, location and budget)" if matches is None
                   else json.dumps([{**m, "price_display": fmt_price(m["price"], m["listing_type"])} for m in matches]) or "[]")
     system = (f"{REPLY_RULES}\n\nCOLLECTED: {json.dumps(collected)}\nSTILL_MISSING: {missing}\n"
-              f"MATCHING_LISTINGS: {match_info}\nLEAD_SAVED: {can_save}\n"
+              f"MATCHING_LISTINGS: {match_info}\nLEAD_SAVED: {can_save}\nHANDOFF_REQUESTED: {bool(req.get('handoff'))}\n"
               f"PHONE_INVALID: {phone_invalid} (if true, politely ask for a valid 10-digit Indian mobile number)")
 
     async def gen():
@@ -249,12 +281,15 @@ async def chat_stream(body: ChatIn):
         lead_id = s.get("lead_id")
         if can_save:
             lead = build_lead_fields(req, matches)
-            lead.update({"transcript": all_msgs, "session_id": sid, "source": "chatbot", "updated_at": now_iso()})
+            lead.update({"transcript": all_msgs, "session_id": sid, "source": "chatbot", "updated_at": now_iso(),
+                         "handoff_requested": bool(req.get("handoff")), "source_page": s.get("source_page") or body.source_page,
+                         "enquiry_type": "Human handoff" if req.get("handoff") else "AI-qualified enquiry"})
             if lead_id:
                 await db.leads.update_one({"id": lead_id}, {"$set": lead})
             else:
                 lead_id = str(uuid.uuid4())
-                await db.leads.insert_one({**lead, "id": lead_id, "status": "New", "created_at": now_iso()})
+                await db.leads.insert_one({**lead, "id": lead_id, "status": "New", "notes": [], "created_at": now_iso()})
+                asyncio.create_task(send_lead_alert(lead))
             update["lead_id"] = lead_id
         await db.chat_sessions.update_one({"session_id": sid}, {"$set": update})
         yield f"data: {json.dumps({'type': 'done', 'lead_saved': bool(lead_id)})}\n\n"

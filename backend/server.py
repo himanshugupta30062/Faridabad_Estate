@@ -19,6 +19,11 @@ from auth import router as auth_router, get_current_admin, seed_admin
 from chat import (router as chat_router, extract_requirements, build_lead_fields, normalize_phone, now_iso,
                   public_property)
 from seed import seed_properties
+from catalog import migrate_properties, slugify
+from emailer import send_lead_alert
+from site_api import router as site_router
+import csv
+import io
 from storage import APP_NAME, init_storage, put_object, get_object
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
@@ -35,6 +40,7 @@ INDEXES = {
               IndexModel([("created_at", DESCENDING)], name="created_desc"),
               IndexModel([("session_id", ASCENDING)], name="session_id")],
     "chat_sessions": [IndexModel([("session_id", ASCENDING)], name="session_id", unique=True)],
+    "favourites": [IndexModel([("user_id", ASCENDING), ("property_id", ASCENDING)], name="user_prop", unique=True)],
     "files": [IndexModel([("storage_path", ASCENDING)], name="storage_path")],
 }
 
@@ -60,42 +66,6 @@ async def root():
     return {"message": "PropMitra API"}
 
 
-@api.get("/properties")
-async def list_properties(listing_type: Optional[Literal["buy", "rent"]] = None, location: Optional[str] = None,
-                          min_price: Optional[float] = Query(None, ge=0), max_price: Optional[float] = Query(None, ge=0),
-                          property_type: Optional[str] = None, bedrooms: Optional[int] = Query(None, ge=1, le=10)):
-    q = {"is_active": True}
-    if listing_type:
-        q["listing_type"] = listing_type
-    if location:
-        q["location"] = {"$regex": f"^{re.escape(location)}$", "$options": "i"}
-    if property_type:
-        q["property_type"] = property_type
-    if bedrooms:
-        q["bedrooms"] = {"$gte": 4} if bedrooms >= 4 else bedrooms
-    if min_price is not None or max_price is not None:
-        q["price"] = {}
-        if min_price is not None:
-            q["price"]["$gte"] = min_price
-        if max_price is not None:
-            q["price"]["$lte"] = max_price
-    docs = await db.properties.find(q, {"_id": 0}).sort([("order", 1), ("created_at", -1)]).to_list(200)
-    return [public_property(d) for d in docs]
-
-
-@api.get("/locations")
-async def locations():
-    return sorted(await db.properties.distinct("location", {"is_active": True}))
-
-
-@api.get("/properties/{pid}")
-async def get_property(pid: str):
-    d = await db.properties.find_one({"id": pid, "is_active": True}, {"_id": 0})
-    if not d:
-        raise HTTPException(status_code=404, detail="Property not found")
-    return public_property(d)
-
-
 @api.get("/files/{path:path}")
 async def serve_file(path: str):
     rec = await db.files.find_one({"storage_path": path, "is_deleted": False})
@@ -106,6 +76,10 @@ async def serve_file(path: str):
 
 
 # ---------- Enquiry form ----------
+ENQUIRY_LABELS = {"callback": "Callback request", "visit": "Site visit request", "tour": "Property tour", "whatsapp": "WhatsApp enquiry",
+                  "contact_agent": "Contact agent", "property": "Property enquiry", "sell": "Sell my property"}
+
+
 class EnquiryIn(BaseModel):
     name: str = Field(min_length=2, max_length=80)
     phone: str
@@ -114,6 +88,10 @@ class EnquiryIn(BaseModel):
     budget: str = Field(default="", max_length=80)
     message: str = Field(default="", max_length=1000)
     property_id: Optional[str] = None
+    enquiry_type: Literal["callback", "visit", "tour", "whatsapp", "contact_agent", "property", "sell"] = "callback"
+    preferred_date: Optional[str] = Field(default=None, max_length=40)
+    source_page: Optional[str] = Field(default=None, max_length=200)
+    campaign: Optional[str] = Field(default=None, max_length=120)
 
     @field_validator("phone")
     @classmethod
@@ -127,6 +105,8 @@ class EnquiryIn(BaseModel):
 async def create_enquiry(body: EnquiryIn):
     text = (f"Visitor: I want to {body.intent}. Location: {body.location or 'not specified'}. "
             f"Budget: {body.budget or 'not specified'}. {body.message}\nVisitor: My name is {body.name}, phone {body.phone}.")
+    label = ENQUIRY_LABELS[body.enquiry_type]
+    text += f"\nVisitor: Enquiry type: {label}." + (f" Preferred date: {body.preferred_date}." if body.preferred_date else "")
     prop = None
     if body.property_id:
         prop = await db.properties.find_one({"id": body.property_id}, {"_id": 0})
@@ -144,10 +124,13 @@ async def create_enquiry(body: EnquiryIn):
         req["summary"] = f"{body.name} submitted a website enquiry to {body.intent} in {body.location or 'Hyderabad'}."
     matches = [public_property(prop)] if prop else []
     lead = build_lead_fields(req, matches)
-    lead.update({"id": str(uuid.uuid4()), "source": "website_form", "status": "New", "session_id": None,
+    lead.update({"id": str(uuid.uuid4()), "source": "whatsapp" if body.enquiry_type == "whatsapp" else "website_form",
+                 "enquiry_type": label, "preferred_date": body.preferred_date, "property_id": body.property_id,
+                 "source_page": body.source_page, "campaign": body.campaign, "notes": [], "status": "New", "session_id": None,
                  "transcript": [{"role": "user", "content": text, "ts": now_iso()}],
                  "created_at": now_iso(), "updated_at": now_iso()})
     await db.leads.insert_one(dict(lead))
+    asyncio.create_task(send_lead_alert(lead))
     return {"ok": True, "id": lead["id"]}
 
 
@@ -170,9 +153,25 @@ def bucket(lead):
     return "Above ₹3 Cr"
 
 
+SOURCE_LABELS = {"chatbot": "Property Mitra AI", "website_form": "Website forms", "whatsapp": "WhatsApp"}
+
+
+async def property_performance(leads):
+    enq = Counter()
+    for l in leads:
+        for pid in set((l.get("matched_property_ids") or []) + ([l["property_id"]] if l.get("property_id") else [])):
+            enq[pid] += 1
+    favs = Counter()
+    async for f in db.favourites.find({}, {"_id": 0, "property_id": 1}):
+        favs[f["property_id"]] += 1
+    props = await db.properties.find({}, {"_id": 0, "id": 1, "title": 1, "location": 1, "views": 1, "is_active": 1}).to_list(500)
+    rows = [{**p, "views": p.get("views", 0), "enquiries": enq[p["id"]], "saves": favs[p["id"]]} for p in props]
+    return sorted(rows, key=lambda r: (-r["enquiries"], -r["views"]))[:10]
+
+
 @admin.get("/stats")
 async def stats():
-    leads = await db.leads.find({}, {"_id": 0, "intent": 1, "temperature": 1, "location": 1, "budget_max": 1}).to_list(10000)
+    leads = await db.leads.find({}, {"_id": 0, "transcript": 0}).sort("created_at", -1).to_list(10000)
     intents = Counter((l.get("intent") or "unknown") for l in leads)
     temps = Counter((l.get("temperature") or "Warm") for l in leads)
     locs = Counter()
@@ -189,6 +188,10 @@ async def stats():
         "top_locations": [{"location": k, "count": v} for k, v in locs.most_common(6)],
         "budget_distribution": [{"bucket": b, "count": buckets[b]} for b in order if buckets.get(b)],
         "active_listings": await db.properties.count_documents({"is_active": True}),
+        "sources": [{"source": k, "count": v} for k, v in Counter(SOURCE_LABELS.get(l.get("source"), l.get("source") or "Other") for l in leads).most_common()],
+        "status": dict(Counter(l.get("status") or "New" for l in leads)),
+        "recent": [{k: l.get(k) for k in ["id", "name", "intent", "location", "temperature", "created_at", "source"]} for l in leads[:5]],
+        "property_performance": await property_performance(leads),
     }
 
 
@@ -217,7 +220,34 @@ async def get_lead(lid: str):
 
 class LeadPatch(BaseModel):
     temperature: Optional[Literal["Hot", "Warm", "Cold"]] = None
-    status: Optional[Literal["New", "Contacted", "Site visit", "Closed"]] = None
+    status: Optional[Literal["New", "Contacted", "Follow-up", "Visit scheduled", "Negotiation", "Closed", "Lost"]] = None
+
+
+class NoteIn(BaseModel):
+    text: str = Field(min_length=1, max_length=1000)
+
+
+@admin.post("/leads/{lid}/notes")
+async def add_note(lid: str, body: NoteIn, user=Depends(get_current_admin)):
+    note = {"id": str(uuid.uuid4()), "text": body.text.strip(), "author": user.get("name") or user["email"], "created_at": now_iso()}
+    r = await db.leads.update_one({"id": lid}, {"$push": {"notes": note}, "$set": {"updated_at": now_iso()}})
+    if not r.matched_count:
+        raise HTTPException(status_code=404, detail="Lead not found")
+    return note
+
+
+@admin.get("/export/leads.csv")
+async def export_leads():
+    leads = await db.leads.find({}, {"_id": 0, "transcript": 0}).sort("created_at", -1).to_list(10000)
+    buf = io.StringIO()
+    cols = ["created_at", "name", "phone", "intent", "location", "budget_label", "property_type", "bedrooms", "possession",
+            "temperature", "status", "source", "enquiry_type", "preferred_date", "source_page", "summary"]
+    w = csv.writer(buf)
+    w.writerow(cols)
+    for l in leads:
+        w.writerow([l.get(c) if l.get(c) is not None else "" for c in cols])
+    return Response(content=buf.getvalue(), media_type="text/csv",
+                    headers={"Content-Disposition": "attachment; filename=propmitra-enquiries.csv"})
 
 
 @admin.patch("/leads/{lid}")
@@ -241,9 +271,35 @@ class PropertyIn(BaseModel):
     area_sqft: int = Field(ge=100, le=100000)
     price: float = Field(gt=0)
     possession: Optional[Literal["Ready to move", "Under construction"]] = None
-    image_url: str = Field(min_length=5)
+    furnishing: Optional[Literal["Unfurnished", "Semi-furnished", "Fully furnished"]] = None
+    images: list[str] = Field(min_length=1, max_length=15)
+    highlights: list[str] = Field(default_factory=list, max_length=12)
+    latitude: Optional[float] = Field(default=None, ge=-90, le=90)
+    longitude: Optional[float] = Field(default=None, ge=-180, le=180)
+    is_sample: bool = False
     description: str = Field(min_length=10, max_length=2000)
     is_active: bool = True
+
+    @field_validator("images")
+    @classmethod
+    def clean_images(cls, v):
+        v = [u.strip() for u in v if u and u.strip()]
+        if not v:
+            raise ValueError("Add at least one image")
+        for u in v:
+            if not (u.startswith("https://") or u.startswith("/api/files/")):
+                raise ValueError("Image links must start with https://")
+        return v
+
+    @field_validator("highlights")
+    @classmethod
+    def clean_hl(cls, v):
+        return [h.strip()[:120] for h in v if h and h.strip()]
+
+    def doc(self):
+        d = self.model_dump()
+        d["image_url"] = d["images"][0]
+        return d
 
     @field_validator("location", "title")
     @classmethod
@@ -258,7 +314,8 @@ async def admin_properties():
 
 @admin.post("/properties")
 async def create_property(body: PropertyIn):
-    doc = {**body.model_dump(), "id": str(uuid.uuid4()), "is_sample": False, "featured": True, "order": 100,
+    pid = str(uuid.uuid4())
+    doc = {**body.doc(), "id": pid, "slug": f"{slugify(body.title)}-{pid[:6]}", "featured": True, "order": 100, "views": 0,
            "created_at": now_iso(), "updated_at": now_iso()}
     await db.properties.insert_one(dict(doc))
     doc.pop("_id", None)
@@ -267,7 +324,7 @@ async def create_property(body: PropertyIn):
 
 @admin.put("/properties/{pid}")
 async def update_property(pid: str, body: PropertyIn):
-    r = await db.properties.update_one({"id": pid}, {"$set": {**body.model_dump(), "updated_at": now_iso()}})
+    r = await db.properties.update_one({"id": pid}, {"$set": {**body.doc(), "updated_at": now_iso()}})
     if not r.matched_count:
         raise HTTPException(status_code=404, detail="Property not found")
     return await db.properties.find_one({"id": pid}, {"_id": 0})
@@ -308,6 +365,7 @@ async def upload(file: UploadFile = File(...), user=Depends(get_current_admin)):
 
 
 app.include_router(api)
+app.include_router(site_router)
 app.include_router(auth_router)
 app.include_router(chat_router)
 app.include_router(admin)
@@ -321,6 +379,7 @@ async def startup():
     app.state.index_task = asyncio.create_task(ensure_indexes())
     await seed_admin()
     await seed_properties()
+    await migrate_properties()
     try:
         await asyncio.to_thread(init_storage)
     except Exception as e:

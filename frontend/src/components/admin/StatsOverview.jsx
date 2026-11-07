@@ -85,6 +85,27 @@ export const StatsOverview = ({ stats }) => {
           </ResponsiveContainer></div>
         ) : <p className="text-zinc-500 text-sm">No data yet</p>}
       </Panel>
+      <div className="grid lg:grid-cols-3 gap-4 sm:gap-6">
+        <Panel title="Lead sources" testid="panel-sources">
+          <Split data={Object.fromEntries(stats.sources.map((s) => [s.source, s.count]))} colors={Object.fromEntries(stats.sources.map((s, i) => [s.source, ["#D4AF37", "#F3E5AB", "#8A7322", "#A1A1AA"][i % 4]]))} />
+        </Panel>
+        <Panel title="Recent enquiries" testid="panel-recent">
+          <ul className="space-y-3 text-sm">{stats.recent.map((r) => (
+            <li key={r.id} className="flex justify-between gap-2"><span className="text-white truncate">{r.name} <span className="text-zinc-500 capitalize">· {r.intent} · {r.location || "—"}</span></span><span className="text-xs text-zinc-400 shrink-0">{r.temperature}</span></li>
+          ))}{!stats.recent.length && <li className="text-zinc-500">No enquiries yet</li>}</ul>
+        </Panel>
+        <Panel title="Lead status" testid="panel-status">
+          <Split data={stats.status} colors={new Proxy({}, { get: () => "#D4AF37" })} />
+        </Panel>
+      </div>
+      <Panel title="Property performance" testid="panel-property-performance">
+        <div className="overflow-x-auto"><table className="w-full text-sm min-w-[520px]">
+          <thead><tr className="text-left text-[10px] uppercase tracking-[0.15em] text-zinc-500">{["Property", "Location", "Views", "Saves", "Enquiries"].map((h) => <th key={h} className="py-2 pr-4 font-medium">{h}</th>)}</tr></thead>
+          <tbody>{stats.property_performance.map((p) => (
+            <tr key={p.id} className="border-t border-white/5"><td className="py-2.5 pr-4 text-white">{p.title}{!p.is_active && <span className="text-xs text-red-400"> · inactive</span>}</td><td className="pr-4 text-zinc-400">{p.location}</td><td className="pr-4 text-zinc-300">{p.views}</td><td className="pr-4 text-zinc-300">{p.saves}</td><td className="text-[#D4AF37]">{p.enquiries}</td></tr>
+          ))}</tbody>
+        </table></div>
+      </Panel>
     </div>
   );
 };

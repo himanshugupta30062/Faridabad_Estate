@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Plus, Pencil } from "lucide-react";
+import { Plus, Pencil, Eye } from "lucide-react";
 import { toast } from "sonner";
 import { Switch } from "@/components/ui/switch";
 import { api, formatApiError, formatPrice, imageSrc } from "@/lib/api";
@@ -36,8 +36,9 @@ export const ListingsManager = ({ listings, reload }) => {
                 <div className="min-w-0">
                   <p className="text-white truncate">{p.title}</p>
                   <p className="text-sm text-[#D4AF37]">{formatPrice(p.price, p.listing_type)} <span className="text-zinc-500">· {p.location}</span></p>
-                  <p className="text-xs text-zinc-500 mt-0.5">{p.bedrooms} BHK {p.property_type} · {p.listing_type === "rent" ? "Rent" : "Sale"}{p.is_sample ? " · Sample" : ""}</p>
+                  <p className="text-xs text-zinc-500 mt-0.5">{p.bedrooms} BHK {p.property_type} · {p.listing_type === "rent" ? "Rent" : "Sale"}{p.is_sample ? " · Demo" : ""} · {p.views || 0} views</p>
                 </div>
+                <a href={`/property/${p.slug}`} target="_blank" rel="noreferrer" className="text-zinc-400 hover:text-[#D4AF37] h-8 w-8 flex items-center justify-center" aria-label="Preview public listing" data-testid={`admin-listing-preview-${p.id}`}><Eye className="w-4 h-4" /></a>
                 <button onClick={() => { setEditing(p); setOpen(true); }} className="text-zinc-400 hover:text-[#D4AF37] h-8 w-8 flex items-center justify-center" data-testid={`admin-listing-edit-${p.id}`} aria-label="Edit"><Pencil className="w-4 h-4" /></button>
               </div>
               <div className="flex items-center justify-between mt-3 pt-3 border-t border-white/5">

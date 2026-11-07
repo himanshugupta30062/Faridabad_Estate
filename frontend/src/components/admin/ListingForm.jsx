@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { api, formatApiError, imageSrc, PROPERTY_TYPES } from "@/lib/api";
 
 const EMPTY = { title: "", listing_type: "buy", location: "", property_type: "Apartment", bedrooms: "", bathrooms: "", area_sqft: "",
-  price: "", possession: "none", image_url: "", description: "", is_active: true };
+  price: "", possession: "none", furnishing: "none", images: [], newImage: "", highlights: "", latitude: "", longitude: "", description: "", is_active: true, is_sample: false };
 
 const L = ({ label, error, children }) => (
   <label className="block">
@@ -28,7 +28,8 @@ function validate(f) {
   if (!(+f.bedrooms >= 1)) e.bedrooms = "Required";
   if (!(+f.bathrooms >= 1)) e.bathrooms = "Required";
   if (!(+f.area_sqft >= 100)) e.area_sqft = "Min 100 sq.ft";
-  if (!f.image_url) e.image_url = "Add an image link or upload a photo";
+  if (!f.images.length) e.images = "Add at least one image link or upload a photo";
+  if ((f.latitude === "") !== (f.longitude === "")) e.latitude = "Enter both latitude and longitude, or neither";
   if (f.description.trim().length < 10) e.description = "At least 10 characters";
   return e;
 }
@@ -42,7 +43,9 @@ export const ListingForm = ({ open, listing, onClose, onSaved }) => {
 
   useEffect(() => {
     setErrors({});
-    setF(listing ? { ...EMPTY, ...listing, possession: listing.possession || "none" } : EMPTY);
+    setF(listing ? { ...EMPTY, ...listing, possession: listing.possession || "none", furnishing: listing.furnishing || "none",
+      images: listing.images?.length ? listing.images : [listing.image_url].filter(Boolean), highlights: (listing.highlights || []).join("\n"),
+      latitude: listing.latitude ?? "", longitude: listing.longitude ?? "", newImage: "" } : EMPTY);
   }, [listing, open]);
 
   const set = (k) => (e) => setF({ ...f, [k]: e?.target ? e.target.value : e });
@@ -55,7 +58,7 @@ export const ListingForm = ({ open, listing, onClose, onSaved }) => {
       const fd = new FormData();
       fd.append("file", file);
       const { data } = await api.post("/admin/upload", fd);
-      setF((x) => ({ ...x, image_url: data.url }));
+      setF((x) => ({ ...x, images: [...x.images, data.url] }));
       toast.success("Photo uploaded");
     } catch (e) {
       toast.error(formatApiError(e));
@@ -70,8 +73,10 @@ export const ListingForm = ({ open, listing, onClose, onSaved }) => {
     if (Object.keys(e).length) return;
     setBusy(true);
     const body = { ...f, bedrooms: +f.bedrooms, bathrooms: +f.bathrooms, area_sqft: +f.area_sqft, price: +f.price,
-      possession: f.possession === "none" ? null : f.possession };
-    ["id", "is_sample", "featured", "order", "created_at", "updated_at"].forEach((k) => delete body[k]);
+      possession: f.possession === "none" ? null : f.possession, furnishing: f.furnishing === "none" ? null : f.furnishing,
+      highlights: f.highlights.split("\n").map((h) => h.trim()).filter(Boolean),
+      latitude: f.latitude === "" ? null : +f.latitude, longitude: f.longitude === "" ? null : +f.longitude };
+    ["id", "slug", "views", "image_url", "newImage", "featured", "order", "created_at", "updated_at"].forEach((k) => delete body[k]);
     try {
       if (listing) await api.put(`/admin/properties/${listing.id}`, body);
       else await api.post("/admin/properties", body);
@@ -117,17 +122,41 @@ export const ListingForm = ({ open, listing, onClose, onSaved }) => {
             </Select>
           </L>
           <div className="sm:col-span-2">
-            <L label="Image" error={errors.image_url}>
+            <L label={`Photos (${f.images.length}) — first photo is the cover`} error={errors.images}>
+              <div className="flex gap-2 flex-wrap mb-2" data-testid="listing-images-list">
+                {f.images.map((u, i) => (
+                  <div key={u + i} className="relative">
+                    <img src={imageSrc(u)} alt="" className={`h-20 w-28 object-cover rounded-sm ${i === 0 ? "ring-2 ring-[#D4AF37]" : ""}`} />
+                    <div className="absolute inset-x-0 bottom-0 flex justify-between bg-black/70 text-[10px]">
+                      {i > 0 ? <button type="button" onClick={() => setF({ ...f, images: [u, ...f.images.filter((_, k) => k !== i)] })} className="px-1.5 py-0.5 text-[#F3E5AB]" data-testid={`listing-image-cover-${i}`}>Make cover</button> : <span className="px-1.5 py-0.5 text-[#F3E5AB]">Cover</span>}
+                      <button type="button" onClick={() => setF({ ...f, images: f.images.filter((_, k) => k !== i) })} className="px-1.5 py-0.5 text-red-300" data-testid={`listing-image-remove-${i}`}>Remove</button>
+                    </div>
+                  </div>
+                ))}
+              </div>
               <div className="flex gap-2">
-                <Input value={f.image_url} onChange={set("image_url")} placeholder="Paste image link (https://…)" className={cls} data-testid="listing-image-url-input" />
+                <Input value={f.newImage} onChange={set("newImage")} placeholder="Paste image link (https://…)" className={cls} data-testid="listing-image-url-input" />
+                <button type="button" onClick={() => { if (/^https:\/\//.test(f.newImage.trim())) setF({ ...f, images: [...f.images, f.newImage.trim()], newImage: "" }); else toast.error("Image links must start with https://"); }}
+                  className="shrink-0 px-3 rounded-sm border border-white/15 text-white text-sm hover:border-[#D4AF37]" data-testid="listing-image-add-button">Add</button>
                 <button type="button" onClick={() => fileRef.current?.click()} disabled={uploading} className="shrink-0 px-3 rounded-sm border border-white/15 text-white text-sm flex items-center gap-1.5 hover:border-[#D4AF37]" data-testid="listing-image-upload-button">
                   {uploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />} Upload
                 </button>
                 <input ref={fileRef} type="file" accept="image/jpeg,image/png,image/webp" hidden onChange={(e) => { upload(e.target.files?.[0]); e.target.value = ""; }} data-testid="listing-image-file-input" />
               </div>
             </L>
-            {f.image_url && <img src={imageSrc(f.image_url)} alt="" className="mt-2 h-28 rounded-sm object-cover" data-testid="listing-image-preview" />}
           </div>
+          <L label="Furnishing">
+            <Select value={f.furnishing} onValueChange={set("furnishing")}>
+              <SelectTrigger className={cls} data-testid="listing-furnishing-select"><SelectValue /></SelectTrigger>
+              <SelectContent><SelectItem value="none">Not specified</SelectItem>{["Unfurnished", "Semi-furnished", "Fully furnished"].map((x) => <SelectItem key={x} value={x}>{x}</SelectItem>)}</SelectContent>
+            </Select>
+          </L>
+          <div className="grid grid-cols-2 gap-2">
+            <L label="Latitude" error={errors.latitude}><Input type="number" step="any" value={f.latitude} onChange={set("latitude")} placeholder="17.44" className={cls} data-testid="listing-lat-input" /></L>
+            <L label="Longitude"><Input type="number" step="any" value={f.longitude} onChange={set("longitude")} placeholder="78.35" className={cls} data-testid="listing-lng-input" /></L>
+          </div>
+          <div className="sm:col-span-2"><L label="Verified highlights (one per line, optional)"><Textarea value={f.highlights} onChange={set("highlights")} placeholder="Only facts you have verified, e.g. East facing" className={`${cls} min-h-[70px]`} data-testid="listing-highlights-input" /></L></div>
+          <label className="sm:col-span-2 flex items-center gap-2 text-sm text-zinc-300"><input type="checkbox" checked={f.is_sample} onChange={(e) => setF({ ...f, is_sample: e.target.checked })} data-testid="listing-sample-checkbox" />Mark as demo / sample listing</label>
           <div className="sm:col-span-2"><L label="Description" error={errors.description}><Textarea value={f.description} onChange={set("description")} className={`${cls} min-h-[90px]`} data-testid="listing-description-input" /></L></div>
         </div>
         <div className="flex justify-end gap-2 mt-2">

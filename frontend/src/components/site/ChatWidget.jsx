@@ -1,12 +1,13 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Sparkles, X, Send, MapPin, BedDouble } from "lucide-react";
+import { Link } from "react-router-dom";
+import { Sparkles, X, Send, MapPin, BedDouble, Headset } from "lucide-react";
 import { API, formatPrice, imageSrc } from "@/lib/api";
 
 const SID_KEY = "propmitra_chat_sid";
 const GREETING = "Namaste! I'm Property Mitra, your AI property advisor from UrbanNest Properties. Are you looking to Buy, Rent or Sell a property in Hyderabad?";
 
 const MiniCard = ({ p }) => (
-  <div className="flex gap-3 bg-[#0F0F12] border border-[#D4AF37]/30 rounded-sm p-2 min-w-[240px]" data-testid={`chat-match-${p.id}`}>
+  <Link to={`/property/${p.slug}`} className="flex gap-3 bg-[#0F0F12] border border-[#D4AF37]/30 hover:border-[#D4AF37] rounded-sm p-2 min-w-[260px] max-w-[280px]" data-testid={`chat-match-${p.id}`}>
     <img src={imageSrc(p.image_url)} alt={p.title} className="w-20 h-16 object-cover rounded-sm" />
     <div className="min-w-0">
       <p className="text-[#D4AF37] font-serif text-sm">{formatPrice(p.price, p.listing_type)}</p>
@@ -15,9 +16,10 @@ const MiniCard = ({ p }) => (
         <span className="flex items-center gap-0.5"><MapPin className="w-3 h-3" />{p.location}</span>
         <span className="flex items-center gap-0.5"><BedDouble className="w-3 h-3" />{p.bedrooms} BHK</span>
       </p>
-      {p.is_sample && <p className="text-[9px] uppercase tracking-widest text-[#F3E5AB]/70 mt-0.5">Sample listing</p>}
+      {p.reasons?.length > 0 && <p className="text-[10px] text-emerald-300/90 mt-1 leading-snug line-clamp-2">✓ {p.reasons.join(" · ")}</p>}
+      <p className="text-[9px] uppercase tracking-widest text-[#F3E5AB]/70 mt-0.5">{p.is_sample ? "Demo listing · " : ""}View details →</p>
     </div>
-  </div>
+  </Link>
 );
 
 const Bubble = ({ m }) => (
@@ -37,8 +39,13 @@ export const ChatWidget = () => {
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
   const [leadSaved, setLeadSaved] = useState(false);
+  const [configured, setConfigured] = useState(true);
   const sid = useRef(localStorage.getItem(SID_KEY));
   const endRef = useRef(null);
+
+  useEffect(() => {
+    fetch(`${API}/chat/status`).then((r) => r.json()).then((d) => setConfigured(d.configured)).catch(() => {});
+  }, []);
 
   useEffect(() => {
     if (!sid.current) return;
@@ -59,8 +66,11 @@ export const ChatWidget = () => {
     const patchLast = (fn) => setMessages((ms) => { const c = [...ms]; c[c.length - 1] = fn(c[c.length - 1]); return c; });
     try {
       const res = await fetch(`${API}/chat/stream`, { method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ session_id: sid.current, message: msg }) });
-      if (!res.ok) throw new Error("request failed");
+        body: JSON.stringify({ session_id: sid.current, message: msg, source_page: window.location.pathname }) });
+      if (!res.ok) {
+        const d = await res.json().catch(() => ({}));
+        throw new Error(typeof d.detail === "string" ? d.detail : "Sorry, I couldn't connect just now. Please try again in a moment.");
+      }
       const reader = res.body.getReader();
       const dec = new TextDecoder();
       let buf = "";
@@ -81,8 +91,8 @@ export const ChatWidget = () => {
           else if (ev.type === "done") setLeadSaved(ev.lead_saved);
         }
       }
-    } catch {
-      patchLast((m) => ({ ...m, content: "Sorry, I couldn't connect just now. Please try again in a moment." }));
+    } catch (err) {
+      patchLast((m) => ({ ...m, content: err.message || "Sorry, I couldn't connect just now. Please try again in a moment." }));
     } finally {
       setBusy(false);
     }
@@ -104,7 +114,7 @@ export const ChatWidget = () => {
   return (
     <>
       {!open && (
-        <button onClick={() => setOpen(true)} className="fixed bottom-4 right-4 sm:bottom-5 sm:right-5 z-50 btn-gold rounded-full px-4 sm:pl-4 sm:pr-5 h-12 sm:h-14 flex items-center gap-2 shadow-2xl font-medium" data-testid="chat-open-button">
+        <button onClick={() => setOpen(true)} className="fixed bottom-20 lg:bottom-5 right-4 sm:right-5 z-50 btn-gold rounded-full px-4 sm:pl-4 sm:pr-5 h-12 sm:h-14 flex items-center gap-2 shadow-2xl font-medium" data-testid="chat-open-button">
           <Sparkles className="w-5 h-5" /> <span className="hidden sm:inline">Ask Property Mitra</span>
         </button>
       )}
@@ -119,16 +129,20 @@ export const ChatWidget = () => {
               </div>
             </div>
             <div className="flex items-center gap-1">
+              <button onClick={() => send("I'd like to talk to a human advisor, please.")} disabled={busy} className="text-[11px] text-[#F3E5AB] hover:text-white px-2 flex items-center gap-1" data-testid="chat-handoff-button"><Headset className="w-3.5 h-3.5" />Human</button>
               <button onClick={reset} className="text-[11px] text-zinc-500 hover:text-white px-2" data-testid="chat-new-button">New chat</button>
               <button onClick={() => setOpen(false)} className="text-zinc-400 hover:text-white p-1" data-testid="chat-close-button" aria-label="Close chat"><X className="w-5 h-5" /></button>
             </div>
           </div>
           <div className="flex-1 overflow-y-auto thin-scroll p-4 space-y-4" data-testid="chat-messages">
             {messages.map((m, i) => <Bubble key={i} m={m} />)}
-            {messages.length === 1 && (
+            {!configured && <p className="text-center text-xs text-red-300 bg-red-500/10 rounded-sm p-3" data-testid="chat-not-configured">Property Mitra isn't configured yet (AI key missing on the server). Please call or WhatsApp UrbanNest directly.</p>}
+            {messages.length === 1 && configured && (
               <div className="flex gap-2 flex-wrap">
-                {["Buy", "Rent", "Sell"].map((t) => (
-                  <button key={t} onClick={() => send(`I want to ${t.toLowerCase()} a property`)} data-testid={`chat-quick-${t.toLowerCase()}`}
+                {[["buy", "Buy", "I want to buy a property"], ["rent", "Rent", "I want to rent a property"], ["sell", "Sell", "I want to sell my property"],
+                  ["eg1", "3 BHK in Kondapur under ₹1.5 Cr", "Find me a 3 BHK in Kondapur under ₹1.5 crore."],
+                  ["eg2", "Rental under ₹35,000", "I need a rental apartment under ₹35,000."]].map(([k, t, m]) => (
+                  <button key={k} onClick={() => send(m)} data-testid={`chat-quick-${k}`}
                     className="px-4 py-1.5 rounded-full border border-[#D4AF37]/50 text-[#F3E5AB] text-sm hover:bg-[#D4AF37]/10">{t}</button>
                 ))}
               </div>

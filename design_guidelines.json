@@ -1,250 +1,205 @@
 {
+  "project_name": "PROPMITRA - UrbanNest Properties Hyderabad",
   "brand_identity": {
-    "app_name": "PropMitra",
-    "consultancy_name": "UrbanNest Properties",
-    "location": "Hyderabad, Telangana",
-    "tagline": "AI-Powered Luxury Real Estate Intelligence for Hyderabad",
-    "archetype": "Luxury & Precision Advisory",
-    "tone": "Sophisticated, trustworthy, warm, high-touch, and technologically advanced"
+    "agency": "UrbanNest Properties",
+    "location": "Hyderabad, Telangana, India",
+    "concept": "World-Class AI Real Estate Brokerage Website & High-End Digital Discovery Platform",
+    "core_aesthetic": "Warm White Editorial & High-End Real Estate Luxury with Charcoal Contrast & Champagne Gold Accents",
+    "design_inspiration": "Zillow/Redfin discovery UX, Sotheby's International Realty editorial photography & typography, SERHANT. energetic storytelling, modern fintech clean layout"
   },
-  "visual_theme": {
-    "theme_mode": "dark_primary_with_light_accents",
-    "user_preferences": "Premium charcoal, white and gold visual identity with responsive mobile-first UI. Simple and effective.",
-    "color_palette": {
-      "bg_dark": "#0F0F12",
-      "bg_card_charcoal": "#1A1A22",
-      "bg_surface_elevated": "#242430",
-      "text_primary": "#F8F9FA",
-      "text_secondary": "#A1A1AA",
-      "text_muted": "#71717A",
-      "gold_primary": "#D4AF37",
-      "gold_hover": "#F3E5AB",
-      "gold_muted": "#8A7322",
-      "gold_gradient": "linear-gradient(135deg, #DFBA45 0%, #B89228 100%)",
-      "white": "#FFFFFF",
-      "border_charcoal": "rgba(255, 255, 255, 0.1)",
-      "border_gold": "rgba(212, 175, 55, 0.3)",
-      "badge_sample": "rgba(212, 175, 55, 0.15)",
-      "hot_lead_red": "#EF4444",
-      "warm_lead_amber": "#F59E0B",
-      "cold_lead_blue": "#3B82F6"
-    }
-  },
-  "typography": {
-    "heading_font": "Playfair Display / Cormorant Garamond / Cabinet Grotesk (serif/display luxury aesthetic)",
-    "body_font": "Outfit / Manrope (clean, high-legibility geometric sans)",
-    "anti_pattern_rule": "DO NOT use Inter or standard Arial for Main and Sub-headings. Use Playfair Display or serif luxury display font for headings, Outfit for body text.",
-    "font_scales": {
-      "h1_hero": "text-4xl sm:text-5xl lg:text-6xl font-serif font-bold tracking-tight text-white",
-      "h2_section": "text-2xl sm:text-3xl lg:text-4xl font-serif font-bold tracking-tight text-white",
-      "h3_card": "text-xl sm:text-2xl font-serif font-semibold text-white",
-      "overline_label": "text-xs uppercase tracking-[0.2em] font-medium text-[#D4AF37]",
-      "body": "text-base text-zinc-300 leading-relaxed",
-      "caption": "text-sm text-zinc-400"
-    }
-  },
-  "layout_and_spacing": {
-    "container_padding": "px-4 sm:px-6 lg:px-12 max-w-7xl mx-auto",
-    "section_spacing": "py-16 sm:py-24 space-y-16",
-    "border_padding_rule": "Containers with border MUST have internal padding p-6 or p-8 to prevent text collision",
-    "bento_grid_marketing": "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8",
-    "admin_dashboard_grid": "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6",
-    "mobile_first": "Ensure all filter bars, cards, property modals, floating chatbot widgets, and admin lead tables collapse smoothly for mobile screens."
-  },
-  "key_components": {
-    "navigation_bar": {
-      "style": "Glassmorphism header (backdrop-blur-md bg-[#0F0F12]/85 border-b border-white/10 z-50 sticky top-0)",
-      "elements": ["UrbanNest Logo + PropMitra AI Badge", "Buy/Rent toggle link", "Featured Locations", "About UrbanNest", "Contact Us", "Admin Portal Login Link", "Floating Chat Trigger / Call CTA"]
-    },
-    "hero_section": {
-      "visual": "Immersive luxury real estate background with dark charcoal overlay (bg-black/50 to let dusk pool villa shine through)",
-      "heading": "Find Your Dream Sanctuary in Hyderabad",
-      "subheading": "AI-guided real estate discovery across Gachibowli, Kokapet, Financial District, Tellapur & beyond.",
-      "search_bar": "Unified interactive filter box with Buy/Rent tabs, Location selector, Budget slider, Property Type drop-down, Bedrooms selector, and 'Search with AI' button."
-    },
-    "property_grid_and_cards": {
-      "badge": "Mandatory visible tag 'SAMPLE LISTING' (gold border + soft gold glow bg) on all 8 sample cards to meet problem statement requirements.",
-      "card_style": "Dark charcoal background (#1A1A22), crisp 1px gold border on hover, subtle image scale transition, metadata pill badges (BHK, Sq.Ft, Location, Price).",
-      "features": ["Quick view details modal", "Schedule visit request", "Chat about this property CTA (pre-fills Chatbot context)"]
-    },
-    "ai_chatbot_widget": {
-      "name": "Property Mitra",
-      "type": "Floating widget (bottom-right on public site) with notification badge & avatar",
-      "conversation_flow": [
-        "Greeting & Persona introduction as UrbanNest AI Real Estate Advisor",
-        "Ask Buy / Rent / Sell intent",
-        "Collect preferences: Preferred Location (e.g. Kokapet, Gachibowli), Budget Range (e.g. ₹1.5 Cr - ₹3 Cr), Property Type (Villa/Apartment), Bedrooms (2/3/4 BHK), Possession timeline",
-        "Display matching property cards right inside the chat bubble carousel with images & key specs",
-        "Collect User Name & Phone Number to request contact / site visit from UrbanNest agent",
-        "Store enquiry into Admin Lead Table in real-time"
-      ]
-    },
-    "admin_dashboard": {
-      "access": "Protected login screen (Email/Password & Google sign-in demo)",
-      "widgets": [
-        "Top Summary Cards: Total Enquiries, Buy/Rent/Sell ratio, Hot/Warm/Cold leads breakdown, Most popular location",
-        "Analytics Charts (Recharts): Leads by Location, Budget Distribution, Monthly Lead Trend",
-        "Lead Table: Filterable list with Lead Name, Phone, Intent (Buy/Rent/Sell), Budget, Target Location, Temperature Badge (Hot/Warm/Cold), Date",
-        "Lead Detail Drawer/Modal: Complete user requirements, matched properties, full transcript of Property Mitra conversation, AI summary, and One-Click Copyable WhatsApp Follow-Up Message",
-        "Listings Management (CRUD): Add new listing, edit price/details, toggle active/deactive status, update image URL or mock upload"
-      ]
-    }
-  },
-  "sample_listings_data": [
-    {
-      "id": "prop-1",
-      "title": "The Grand Horizon Luxury Highrise",
-      "location": "Kokapet, Hyderabad",
-      "type": "Apartment",
-      "intent": "Buy",
-      "price": "₹ 2.85 Cr",
-      "price_val": 28500000,
-      "bedrooms": "4 BHK",
-      "area": "3,400 sq.ft",
-      "possession": "Ready to Move",
-      "image": "https://images.unsplash.com/photo-1783696147892-eec669309ca2?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzNDR8MHwxfHNlYXJjaHw0fHxtb2Rlcm4lMjBhcmNoaXRlY3R1cmFsJTIwYnVpbGRpbmclMjB2aWxsYSUyMGV4dGVyaW9yJTIwZHVzayUyMHBvb2x8ZW58MHx8fHwxNzk0MDM4MjM1fDA&ixlib=rb-4.1.0&q=85",
-      "tag": "Sample",
-      "features": ["Private Balcony", "Infinity Pool", "2 Car Parking", "Clubhouse Access"]
-    },
-    {
-      "id": "prop-2",
-      "title": "Aura Serenity Villa",
-      "location": "Tellapur, Hyderabad",
-      "type": "Villa",
-      "intent": "Buy",
-      "price": "₹ 4.50 Cr",
-      "price_val": 45000000,
-      "bedrooms": "4 BHK",
-      "area": "4,200 sq.ft",
-      "possession": "Under Construction (Dec 2026)",
-      "image": "https://images.unsplash.com/photo-1635108201018-94bbbfac4a79?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzNDR8MHwxfHNlYXJjaHwxfHxtb2Rlcm4lMjBhcmNoaXRlY3R1cmFsJTIwYnVpbGRpbmclMjB2aWxsYSUyMGV4dGVyaW9yJTIwZHVzayUyMHBvb2x8ZW58MHx8fHwxNzk0MDM4MjM1fDA&ixlib=rb-4.1.0&q=85",
-      "tag": "Sample",
-      "features": ["Private Garden", "Duplex Living", "Solar Powered", "Gated Security"]
-    },
-    {
-      "id": "prop-3",
-      "title": "Financial District Corporate Residence",
-      "location": "Financial District, Hyderabad",
-      "type": "Apartment",
-      "intent": "Rent",
-      "price": "₹ 65,000 / mo",
-      "price_val": 65000,
-      "bedrooms": "3 BHK",
-      "area": "2,100 sq.ft",
-      "possession": "Immediate",
-      "image": "https://images.unsplash.com/photo-1758448511320-05d7d28f4298?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA2ODl8MHwxfHNlYXJjaHwxfHxtb2Rlcm4lMjBsdXh1cnklMjBhcGFydG1lbnQlMjBsaXZpbmclMjByb29tJTIwYmFsY29ueSUyMGludGVyaW9yfGVufDB8fHx8MTc5MzY4ODQ0MXww&ixlib=rb-4.1.0&q=85",
-      "tag": "Sample",
-      "features": ["Fully Furnished", "Walk to IT Parks", "EV Charging Point", "Gymnasium"]
-    },
-    {
-      "id": "prop-4",
-      "title": "Gachibowli Crest Residence",
-      "location": "Gachibowli, Hyderabad",
-      "type": "Apartment",
-      "intent": "Buy",
-      "price": "₹ 1.95 Cr",
-      "price_val": 19500000,
-      "bedrooms": "3 BHK",
-      "area": "2,450 sq.ft",
-      "possession": "Ready to Move",
-      "image": "https://images.unsplash.com/photo-1702295297205-700e205030d0?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2NjZ8MHwxfHNlYXJjaHwxfHxsdXh1cnklMjBhcGFydG1lbnQlMjB2aWxsYSUyMGludGVyaW9yJTIwSHlkZXJhYmFkJTIwbW9kZXJuJTIwaG9tZXxlbnwwfHx8fE13OTQwMzgyMzV8MA&ixlib=rb-4.1.0&q=85",
-      "tag": "Sample",
-      "features": ["Central AC", "Modular Kitchen", "East Facing", "High Speed Elevator"]
-    },
-    {
-      "id": "prop-5",
-      "title": "Kondapur Green Meadows Flat",
-      "location": "Kondapur, Hyderabad",
-      "type": "Apartment",
-      "intent": "Buy",
-      "price": "₹ 1.35 Cr",
-      "price_val": 13500000,
-      "bedrooms": "2 BHK",
-      "area": "1,550 sq.ft",
-      "possession": "Ready to Move",
-      "image": "https://images.unsplash.com/photo-1712793042263-cf9eab9a229a?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2NjZ8MHwxfHNlYXJjaHwyfHxsdXh1cnklMjBhcGFydG1lbnQlMjB2aWxsYSUyMGludGVyaW9yJTIwSHlkZXJhYmFkJTIwbW9kZXJuJTIwaG9tZXxlbnwwfHx8fDE3OTQwMzgyMzV8MA&ixlib=rb-4.1.0&q=85",
-      "tag": "Sample",
-      "features": ["Near Botanical Gardens", "24/7 Power Backup", "Covered Car Parking", "Children Play Area"]
-    },
-    {
-      "id": "prop-6",
-      "title": "Madhapur Tech-Hub Studio Suite",
-      "location": "Madhapur, Hyderabad",
-      "type": "Apartment",
-      "intent": "Rent",
-      "price": "₹ 42,000 / mo",
-      "price_val": 42000,
-      "bedrooms": "2 BHK",
-      "area": "1,200 sq.ft",
-      "possession": "Immediate",
-      "image": "https://images.unsplash.com/photo-1779903726439-5c27e3996c8a?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA2ODl8MHwxfHNlYXJjaHwyfHxtb2Rlcm4lMjBsdXh1cnklMjBhcGFydG1lbnQlMjBsaXZpbmclMjByb29tJTIwYmFsY29ueSUyMGludGVyaW9yfGVufDB8fHx8MTc5MzY4ODQ0MXww&ixlib=rb-4.1.0&q=85",
-      "tag": "Sample",
-      "features": ["Close to Metro", "High Speed Broadband", "Housekeeping Available", "Security Guard"]
-    },
-    {
-      "id": "prop-7",
-      "title": "Narsingi Royal Courtyard Villa",
-      "location": "Narsingi, Hyderabad",
-      "type": "Villa",
-      "intent": "Buy",
-      "price": "₹ 3.90 Cr",
-      "price_val": 39000000,
-      "bedrooms": "4 BHK",
-      "area": "3,800 sq.ft",
-      "possession": "Ready to Move",
-      "image": "https://images.unsplash.com/photo-1593714604578-d9e41b00c6c6?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzNDR8MHwxfHNlYXJjaHwzfHxtb2Rlcm4lMjBhcmNoaXRlY3R1cmFsJTIwYnVpbGRpbmclMjB2aWxsYSUyMGV4dGVyaW9yJTIwZHVzayUyMHBvb2x8ZW58MHx8fHwxNzk0MDM4MjM1fDA&ixlib=rb-4.1.0&q=85",
-      "tag": "Sample",
-      "features": ["Corner Plot", "Private Pool", "Home Theatre Room", "Smart Home Automation"]
-    },
-    {
-      "id": "prop-8",
-      "title": "Miyapur Urban Comfort Residence",
-      "location": "Miyapur, Hyderabad",
-      "type": "Apartment",
-      "intent": "Buy",
-      "price": "₹ 88 Lakhs",
-      "price_val": 8800000,
-      "bedrooms": "3 BHK",
-      "area": "1,700 sq.ft",
-      "possession": "Ready to Move",
-      "image": "https://images.unsplash.com/photo-1785528266150-3154b0c13dc1?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA2ODl8MHwxfHNlYXJjaHw0fHxtb2Rlcm4lMjBsdXh1cnklMjBhcGFydG1lbnQlMjBsaXZpbmclMjByb29tJTIwYmFsY29ueSUyMGludGVyaW9yfGVufDB8fHx8MTc5MzY4ODQ0MXww&ixlib=rb-4.1.0&q=85",
-      "tag": "Sample",
-      "features": ["Affordable Luxury", "Near Miyapur Metro Station", "Gated Security", "Supermarket in Complex"]
-    }
-  ],
-  "team_and_advisor_media": {
-    "advisor_portrait": "https://images.unsplash.com/photo-1560250097-0b93528c311a?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDk1Nzl8MHwxfHNlYXJjaHwxfHxyZWFsJTIwZXN0YXRlJTIwYWdlbnQlMjBhZHZpc29yJTIwcG9ydHJhaXQlMjBwcm9mZXNzaW9uYWx8ZW58MHx8fHwxNzg4Nzk4MDk3fDA&ixlib=rb-4.1.0&q=85",
-    "female_consultant": "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDk1Nzl8MHwxfHNlYXJjaHwyfHxyZWFsJTIwZXN0YXRlJTIwYWdlbnQlMjBhZHZpc29yJTIwcG9ydHJhaXQlMjBwcm9mZXNzaW9uYWx8ZW58MHx8fHwxNzg4Nzk4MDk3fDA&ixlib=rb-4.1.0&q=85",
-    "senior_partner": "https://images.unsplash.com/photo-1647580427155-0483906cb9de?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDk1Nzl8MHwxfHNlYXJjaHwzfHxyZWFsJTIwZXN0YXRlJTIwYWdlbnQlMjBhZHZpc29yJTIwcG9ydHJhaXQlMjBwcm9mZXNzaW9uYWx8ZW58MHx8fHwxNzg4Nzk4MDk3fDA&ixlib=rb-4.1.0&q=85"
-  },
-  "testing_requirements": {
-    "data_testid_rule": "ALL interactive components MUST have explicit kebab-case data-testid attributes",
-    "examples": [
-      "data-testid=\"hero-search-input\"",
-      "data-testid=\"filter-buy-rent-toggle\"",
-      "data-testid=\"filter-location-select\"",
-      "data-testid=\"filter-budget-select\"",
-      "data-testid=\"filter-property-type\"",
-      "data-testid=\"filter-bedrooms-select\"",
-      "data-testid=\"property-card-sample-prop-1\"",
-      "data-testid=\"property-detail-modal\"",
-      "data-testid=\"chatbot-floating-button\"",
-      "data-testid=\"chatbot-input-field\"",
-      "data-testid=\"chatbot-send-button\"",
-      "data-testid=\"admin-login-email-input\"",
-      "data-testid=\"admin-login-password-input\"",
-      "data-testid=\"admin-login-submit-button\"",
-      "data-testid=\"admin-google-login-button\"",
-      "data-testid=\"lead-table-row-1\"",
-      "data-testid=\"lead-detail-whatsapp-copy-button\"",
-      "data-testid=\"admin-add-listing-button\""
+  "colors": {
+    "background_light": "#FAF9F6",
+    "background_paper": "#F4F1EA",
+    "card_light": "#FFFFFF",
+    "text_primary_light": "#111111",
+    "text_secondary_light": "#55524D",
+    "background_dark": "#0F0F12",
+    "card_dark": "#18181C",
+    "text_primary_dark": "#FAF9F6",
+    "text_secondary_dark": "#A1A09A",
+    "brand_champagne_gold": "#D4AF37",
+    "brand_champagne_gold_hover": "#C5A059",
+    "brand_champagne_gold_light": "#F9F3E3",
+    "brand_charcoal": "#1A1A1E",
+    "brand_charcoal_deep": "#111114",
+    "accent_warm_stone": "#E8E4DC",
+    "border_light": "#E5E1D8",
+    "border_dark": "#2A2A30",
+    "status_success": "#10B981",
+    "status_warning": "#F59E0B",
+    "status_info": "#3B82F6",
+    "forbidden_colors": [
+      "#7351B7",
+      "#1B93A4"
     ]
   },
-  "instructions_to_main_agent": [
-    "Ensure all components use standard JavaScript (.js / .jsx) files as specified in project structure.",
-    "Implement Sonner toast notifications for actions like login success, inquiry submitted, WhatsApp text copied, and property added/edited.",
-    "Do NOT use transparent headers over text or dropdown menus with clear backgrounds - always apply solid or backdrop-blur backgrounds with subtle borders.",
-    "Ensure Property Mitra chatbot floating widget is easily accessible on mobile and desktop and leads generated are synced directly to local storage / memory state for the Admin Dashboard to read immediately.",
-    "Provide clear sample listing markers on cards and maintain high visual luxury with charcoal & gold theme."
+  "typography": {
+    "heading_font": "\"Playfair Display\", Georgia, serif",
+    "body_font": "\"Outfit\", \"Plus Jakarta Sans\", sans-serif",
+    "mono_font": "\"JetBrains Mono\", monospace",
+    "h1_hero": "text-4xl sm:text-5xl lg:text-6xl font-medium tracking-tight leading-[1.1]",
+    "h2_section": "text-2xl sm:text-3xl lg:text-4xl font-semibold tracking-tight leading-snug",
+    "h3_subsection": "text-xl sm:text-2xl font-medium tracking-normal",
+    "h4_card": "text-lg sm:text-xl font-medium",
+    "body_main": "text-base font-normal leading-relaxed text-secondary-light dark:text-secondary-dark",
+    "overline_label": "text-xs font-semibold uppercase tracking-[0.2em] text-champagne-gold"
+  },
+  "spacing_and_layout": {
+    "container_padding": "px-4 sm:px-8 lg:px-12 max-w-7xl mx-auto",
+    "section_gap": "py-16 md:py-24",
+    "card_padding": "p-6 sm:p-8",
+    "border_radius": "rounded-lg md:rounded-xl",
+    "mobile_first_grid": "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8",
+    "bento_grid_marketing": "grid grid-cols-1 md:grid-cols-8 lg:grid-cols-12 gap-6 lg:gap-8"
+  },
+  "surfaces_and_effects": {
+    "crystal_glass_header": "backdrop-blur-xl bg-white/80 dark:bg-black/80 border-b border-border-light/60 dark:border-border-dark/60 shadow-sm",
+    "luxury_card": "bg-white dark:bg-card-dark border border-border-light dark:border-border-dark hover:border-brand-champagne-gold transition-all duration-300 shadow-sm hover:shadow-xl hover:-translate-y-1",
+    "charcoal_hero_banner": "bg-brand-charcoal text-white rounded-2xl p-8 lg:p-12 relative overflow-hidden",
+    "gold_gradient_accent": "bg-gradient-to-r from-[#D4AF37] via-[#E6CA65] to-[#C5A059]"
+  },
+  "page_specific_guidelines": {
+    "homepage": {
+      "hero": {
+        "headline": "Find a Place You'll Love to Call Home.",
+        "subhead": "Discover exceptional properties across Hyderabad with your personal AI real estate advisor.",
+        "search_tabs": [
+          "Buy",
+          "Rent",
+          "Sell / List Property"
+        ],
+        "search_filters": "Location/Neighborhood, Property Type, Price Range, Bedrooms",
+        "ctas": [
+          "Explore Properties",
+          "Talk to Property Mitra"
+        ]
+      },
+      "sections": [
+        "Cinematic Hero with Search Card",
+        "Buy / Rent / Sell Quick Action Entry Points",
+        "Featured Luxury Properties Carousel / Grid",
+        "Popular Hyderabad Neighborhoods (Jubilee Hills, Banjara Hills, Gachibowli, HITEC City, Financial District, Kokapet)",
+        "Curated Collections (Penthouse Living, Gated Villas, Lakeview Condos)",
+        "Why UrbanNest (AI Matchmaker, Transparent Pricing, Concierge Service)",
+        "Meet Your Advisory Team (Agent Profiles)",
+        "How AI Advisory Works (Interactive 3-step timeline)",
+        "Hyderabad Local Market Insights & Investment Trends",
+        "Verified Client Testimonials (Demo-labelled)",
+        "High-Impact Enquiry CTA Banner",
+        "Comprehensive Editorial Footer"
+      ]
+    },
+    "search_page": {
+      "filters": [
+        "Keyword",
+        "Buy/Rent",
+        "Min/Max Price Range",
+        "Property Type (Villa, Apartment, Penthouse, Plot)",
+        "Bedrooms & Bathrooms",
+        "Area / Sqft",
+        "Furnishing (Furnished, Semi-Furnished, Unfurnished)",
+        "Possession Status (Ready to Move, Under Construction)",
+        "Sort (Price Low-High, Price High-Low, Newest, Featured)"
+      ],
+      "view_modes": [
+        "Grid View",
+        "List View",
+        "Split Map View (OpenStreetMap/Leaflet integrated)"
+      ],
+      "features": [
+        "Property Card Image Carousel",
+        "Favorites / Wishlist toggle with badge feedback",
+        "Compare Drawer / Checkbox selection",
+        "Recently Viewed Drawer/Bar",
+        "Share Link Modal",
+        "Sticky Mobile Filter Drawer"
+      ]
+    },
+    "property_detail_page": {
+      "gallery": "Fullscreen Lightbox Gallery with thumbnails and hero grid",
+      "specs": "Bedrooms, Bathrooms, Sqft, Price/Sqft, Facing, Parking, Floor Level, Year Built",
+      "highlights": "Key Features, Luxury Amenities, Society Highlights",
+      "map": "Interactive OpenStreetMap location with neighborhood amenities toggle",
+      "sections": [
+        "Fullscreen Gallery",
+        "Property Specs & Price Breakdown",
+        "Editorial Narrative & Highlights",
+        "Location & Map",
+        "Similar Properties Carousel",
+        "Dedicated Agent Card with WhatsApp CTA",
+        "Schedule Tour / Request Visit Interactive Form",
+        "Sticky Mobile CTA Bar ('Schedule Tour' / 'WhatsApp Agent')"
+      ]
+    },
+    "ai_advisor_widget": {
+      "name": "Property Mitra",
+      "role": "24/7 Hyderabad Real Estate AI Advisor",
+      "capabilities": [
+        "Property Recommendations based on budget & lifestyle",
+        "Area / Neighborhood market price estimates",
+        "Schedule home visits & callbacks",
+        "Mortgage / EMI Calculator assist"
+      ],
+      "interface": "Floating Bottom-Right Floating Bubble + Expanding Conversational Drawer with Quick Suggestion Chips"
+    },
+    "admin_crm_dashboard": {
+      "sections": [
+        "Executive KPI Cards (Total Listings, Active Leads, Site Visits Scheduled, Monthly Revenue)",
+        "Lead Source Analytics Chart (Property Mitra AI, Direct Search, WhatsApp, Meta Ads)",
+        "Property Listing Performance Table",
+        "Lead Management CRM (Status badges, Notes, Contact info, CSV Export)",
+        "Listing CRUD Manager with Multi-Image Uploader simulation"
+      ]
+    },
+    "neighbourhood_pages": {
+      "featured_areas": [
+        "Jubilee Hills",
+        "Banjara Hills",
+        "Gachibowli",
+        "HITEC City",
+        "Financial District",
+        "Kokapet"
+      ],
+      "content": "Area overview, average price/sqft trend, top schools/hospitals nearby, featured luxury listings"
+    }
+  },
+  "image_urls": {
+    "hero_villa_1": "https://images.unsplash.com/photo-1671385539486-a3aeeb1f7909?crop=entropy&cs=srgb&fm=jpg&q=85",
+    "hero_villa_2": "https://images.unsplash.com/photo-1712793042263-cf9eab9a229a?crop=entropy&cs=srgb&fm=jpg&q=85",
+    "interior_living_1": "https://images.unsplash.com/photo-1688646953306-5ec93eab8c06?crop=entropy&cs=srgb&fm=jpg&q=85",
+    "interior_living_2": "https://images.unsplash.com/photo-1600494448850-6013c64ba722?crop=entropy&cs=srgb&fm=jpg&q=85",
+    "bedroom_luxury": "https://images.unsplash.com/photo-1702295297205-700e205030d0?crop=entropy&cs=srgb&fm=jpg&q=85",
+    "hyderabad_skyline": "https://images.unsplash.com/photo-1733374241587-f79d2c31054c?crop=entropy&cs=srgb&fm=jpg&q=85",
+    "agent_female_1": "https://images.unsplash.com/photo-1610631066894-62452ccb927c?crop=entropy&cs=srgb&fm=jpg&q=85",
+    "agent_male_1": "https://images.unsplash.com/photo-1647580427155-0483906cb9de?crop=entropy&cs=srgb&fm=jpg&q=85",
+    "agent_female_2": "https://images.unsplash.com/photo-1581065178047-8ee15951ede6?crop=entropy&cs=srgb&fm=jpg&q=85"
+  },
+  "testing_and_accessibility": {
+    "data_testid_requirement": "EVERY interactive element (buttons, tabs, filter inputs, cards, links, modals, chat toggles, compare checkboxes, login triggers) MUST include a explicit role-based data-testid attribute in kebab-case.",
+    "examples": [
+      "data-testid=\"explore-properties-button\"",
+      "data-testid=\"property-card-101\"",
+      "data-testid=\"ai-mitra-chat-toggle\"",
+      "data-testid=\"search-filter-location-select\"",
+      "data-testid=\"view-mode-grid-button\"",
+      "data-testid=\"property-favorite-button-101\"",
+      "data-testid=\"admin-lead-export-button\""
+    ],
+    "contrast_rules": "All normal text must meet minimum 4.5:1 WCAG AA contrast against backgrounds. Never use fully transparent dark text over dark images without solid gradient backing."
+  },
+  "universal_guidelines_for_main_agent": [
+    "You tend to converge toward generic, 'on distribution' outputs. Avoid this: make creative, distinctive frontends that surprise and delight.",
+    "Dark colors look good when used independently without gradients. DO NOT use dark colors as gradients.",
+    "Don't make generic centered layouts, simplistic gradients, and uniform styling.",
+    "Create depth through layered design elements with z-index hierarchy.",
+    "Use glass-morphism effects with backdrop filters (12-24px blur) where appropriate, avoiding heavy muddy glass.",
+    "You MUST NOT apply universal transition. Eg: transition: all. This results in breaking transforms. Always add transitions for specific interactive elements like button, input excluding transforms.",
+    "You MUST NOT center align the app container, i.e., do not add .App { text-align: center; } in CSS files.",
+    "Always use modern button styles like pill-shaped, or sharp button with interaction animations & color relevant to the app style.",
+    "NEVER use AI assistant Emoji characters like 🤖🧠💭💡🔮🎯 etc. for icons. Use lucide-react or phosphor icons.",
+    "Every interaction needs micro-animations - hover states, transitions, parallax effects, and entrance animations.",
+    "Use 2-3x more spacing than feels comfortable. Cramped designs look cheap.",
+    "All JS code files must be created as .js or .jsx as configured in the codebase.",
+    "All interactive elements MUST include explicit data-testid attributes."
   ]
 }
