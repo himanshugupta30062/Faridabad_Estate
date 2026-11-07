@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
-import { Menu, Sparkles, Heart, GitCompare, User } from "lucide-react";
+import { Menu, Sparkles, Heart, GitCompare, User, ShieldCheck } from "lucide-react";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { openChat } from "@/lib/api";
 import { useAuth } from "@/context/AuthContext";
@@ -50,6 +50,7 @@ export const SiteHeader = () => {
           ) : (
             <Link to={loginTo} className="hidden sm:flex items-center gap-1.5 text-sm px-3 h-10 rounded-full hover:bg-[#F0ECE3]" data-testid="nav-login"><User className="w-4 h-4" />Sign in</Link>
           )}
+          <Link to="/admin" className="hidden sm:flex items-center gap-1.5 text-sm px-3 h-10 rounded-full border border-[#DDD7CB] hover:bg-[#F0ECE3]" data-testid="nav-admin-link"><ShieldCheck className="w-4 h-4" />Admin</Link>
           <button onClick={() => openChat()} className="hidden md:flex btn-dark rounded-full px-4 h-10 text-sm items-center gap-2" data-testid="nav-ask-ai-button"><Sparkles className="w-4 h-4 text-[#e3c77a]" />Ask Estate Mitra</button>
           <button className="lg:hidden w-10 h-10 flex items-center justify-center" onClick={() => setOpen(true)} aria-label="Open menu" data-testid="nav-mobile-toggle"><Menu /></button>
         </div>
@@ -63,6 +64,7 @@ export const SiteHeader = () => {
             ))}
             {user ? <button onClick={() => { logout(); setOpen(false); }} className="py-3 text-left">Sign out</button>
               : <Link to={loginTo} onClick={() => setOpen(false)} className="py-3">Sign in / Create account</Link>}
+            <Link to="/admin" onClick={() => setOpen(false)} className="py-3 flex items-center gap-2" data-testid="nav-mobile-admin-link"><ShieldCheck className="w-4 h-4" />Admin</Link>
             <button onClick={() => { setOpen(false); openChat(); }} className="btn-dark rounded-full h-11 mt-4 flex items-center justify-center gap-2"><Sparkles className="w-4 h-4" />Ask Estate Mitra</button>
           </nav>
         </SheetContent>
