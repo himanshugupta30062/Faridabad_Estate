@@ -152,7 +152,7 @@ export default function PropertyPage() {
       )}
 
       <div className="lg:hidden fixed bottom-0 inset-x-0 z-30 bg-white border-t border-[#E5E1D8] p-3 flex gap-2" data-testid="mobile-sticky-cta">
-        <a href="#whatsapp" onClick={wa} className="h-12 w-12 rounded-md bg-[#1f7a4d] text-white flex items-center justify-center" aria-label="WhatsApp enquiry"><MessageCircle className="w-5 h-5" /></a>
+        <a href="#whatsapp" onClick={wa} className="h-12 w-12 rounded-md bg-[#1f7a4d] text-white flex items-center justify-center" aria-label="WhatsApp enquiry" data-testid="mobile-sticky-whatsapp"><MessageCircle className="w-5 h-5" /></a>
         <button onClick={toForm} className="btn-dark h-12 rounded-md flex-1 font-medium" data-testid="mobile-request-visit">Request a visit</button>
       </div>
       <Lightbox imgs={imgs} index={lb} setIndex={setLb} title={p.title} />

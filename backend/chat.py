@@ -62,7 +62,7 @@ EXTRACT_SYSTEM = """You extract structured real estate requirements from a chat 
 Return ONLY a JSON object, no prose, with keys:
 intent: "buy" | "rent" | "sell" | null
 locations: array of Faridabad locality names the visitor wants (or owns, for sell), Title Case, e.g. ["Sector 15"] or ["Sainik Colony"], or []
-budget_min: number in INR or null; budget_max: number in INR or null. For rent use monthly rent. Convert lakh (1e5) and crore (1e7). "around X" => min 0.85X, max 1.15X. "under X" => max X. For sell, use expected price as budget_max.
+budget_min: number in INR or null; budget_max: number in INR or null. For rent use monthly rent. Convert lakh (1e5) and crore (1e7) exactly: "1.5 crore" = 15000000, "1.25 Cr" = 12500000, "85 lakh" = 8500000, "₹28,000/month" = 28000. "around X" => min 0.85X, max 1.15X. "under X" => max X. For sell, use expected price as budget_max.
 property_type: "Apartment" | "Builder Floor" | "Independent House" | "Villa" | "Plot" | null (flat/society => Apartment, floor => Builder Floor, kothi/house => Independent House)
 bedrooms: integer or null
 possession: "Ready to move" | "Under construction" | "Any" | null

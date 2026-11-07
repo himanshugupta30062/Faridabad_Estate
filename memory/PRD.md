@@ -1,29 +1,25 @@
-# PropMitra — PRD
+# PropMitra → Faridabad Estates — PRD
 
 ## Original problem
-AI-powered real estate website "PropMitra" for UrbanNest Properties (Hyderabad). Visitors can find properties, filter listings, ask an AI property advisor questions, and send qualified buy, rent or sell enquiries. It also has a protected admin dashboard for leads and listings. No transactions, legal verification or payments.
-
-## User choices
-- LLM: Claude Sonnet 5.5 (Emergent LLM key)
-- Admin auth: Email/password (JWT cookies) + Emergent Google sign-in (allowlist ADMIN_EMAILS)
-- Lead temperature: automatic by AI (admin can override)
-- Listing images: paste URL or upload (Emergent object storage)
-- "Simple and effective"
+AI real estate brokerage website, first built for UrbanNest Properties in Hyderabad and later moved to **Faridabad Estates**, Faridabad, Haryana. Tagline: "Find Your Place. Build Your Future." The AI advisor is **Estate Mitra**. Visitors can discover properties, search with filters and talk to the AI advisor. Leads go into an admin CRM. WhatsApp click-to-chat is available, and Hot leads trigger email alerts. No payments or transactions.
 
 ## Architecture
-- Backend FastAPI: server.py (listings, enquiries, admin, upload/files), chat.py (SSE chat, 2-step LLM: extraction → DB matching → streamed reply, lead upsert), auth.py, storage.py, seed.py
-- Mongo collections: properties, leads, chat_sessions, users, user_sessions, login_attempts, files
-- Frontend React: Home (hero, filters, listings, about, testimonials, contact form, chat widget), /admin/login, /admin (Overview, Leads, Listings tabs)
+- FastAPI + MongoDB.
+- Backend files: server.py (enquiries, admin, upload), site_api.py (search, neighbourhoods, insights, favourites, sitemap, search-meta), chat.py (Estate Mitra SSE chat on Claude Sonnet 5.5 via the Emergent key), auth.py (JWT admin/visitor accounts plus Emergent Google sign-in limited to ADMIN_EMAILS), emailer.py (Resend-managed email, Hot leads only), catalog.py and seed.py (Faridabad SAMPLE listings and neighbourhoods).
+- React frontend with Tailwind, shadcn and Leaflet (OpenStreetMap).
+- Business details (phone, WhatsApp, address) are kept in one config file: src/config/company.js.
 
-## Implemented (Nov 2026)
-- 8 sample listings seeded, each marked "Sample listing"
-- Working filters: Buy/Rent, location, budget, type and bedrooms
-- Property Mitra chatbot: recommends only matching active DB listings, handles no-match honestly, collects name and phone (validates 10-digit Indian mobile), saves the lead with AI summary, temperature, matched refs and transcript, and restores the chat after a reload
-- Website callback form also creates leads, with AI summary and temperature
-- Admin: stats (total, intent split, temperature, top locations, budget buckets), leads table with filter and search, and a lead detail sheet (requirements, matches, transcript, summary, WhatsApp copy plus wa.me link, temperature and status override). Listings can be added, edited and deactivated, with URL or upload images
-- Tested by the testing agent (iteration_1); fixed issues: login lockout behind the ingress, no-match prompt, duplicate chat cards, capitalisation
+## Implemented
+- Homepage: hero, search, Explore links (locality, type, budget, buy/rent), featured listings, neighbourhoods, collections, advisory, team placeholders, market insights, demo testimonials, enquiry CTA.
+- Search: filters, sorting, grid/list/map views, compare, favourites (visitor accounts), recently viewed. Default sort is by distance from Sector 10. Locality search has autocomplete.
+- Property detail pages: gallery and lightbox, SEO JSON-LD, map, similar homes, enquiry forms (visit/tour/callback), WhatsApp, a sticky call-to-action bar on mobile.
+- Estate Mitra: queries real listings, explains why each one matches, offers human handoff, saves leads with summary, temperature and transcript.
+- Admin: stats, sources, property performance, follow-ups, leads CRM (notes, status, follow-up date, editable WhatsApp message, CSV export), listings CRUD with multiple images.
+- WhatsApp: floating button, property buttons and admin follow-up all use 918920785645 (REACT_APP_WHATSAPP_NUMBER). Tested in iteration 2: all passed.
+- Hot-lead email alert goes to LEAD_ALERT_EMAIL. **Sending is currently blocked by insufficient Emergent credits**, and the recipient is a test address.
 
 ## Backlog
-- P1: Lead notes and follow-up reminders; export leads as CSV
-- P1: Image gallery (multiple photos per listing)
-- P2: Email/WhatsApp alert to admin on new Hot lead; multiple admin users management UI
+- Real alert recipient email; top up credits.
+- Admin email switched to a Faridabad Estates address; Google admin emails added to the allowlist.
+- Genuine company details: RERA number, registration, team, testimonials.
+- Old Hyderabad test leads to be cleared if wanted.

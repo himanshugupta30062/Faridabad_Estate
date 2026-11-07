@@ -1,0 +1,29 @@
+{
+  "summary": "Frontend-only retest of WhatsApp configuration fix. All requested flows PASS: whatsapp-fab on /, /properties, /about, /contact calls window.open('https://wa.me/918920785645?text=...', '_blank', 'noopener') with prefilled text and no 'not configured' toast; a real (unstubbed) popup also opened and redirected to api.whatsapp.com/send/?phone=918920785645. Homepage cta-whatsapp-link opens wa.me/918920785645. Property detail desktop property-whatsapp and mobile (390px) sticky WhatsApp link open wa.me/918920785645 with title, price, location, Ref (8-char id) and URL. property-call href=tel:+918920785645; footer-phone shows '+91 89207 85645'. Admin lead detail: textarea editable, lead-whatsapp-open href updates live to https://wa.me/91<phone>?text=<edited>, target=_blank; copy button shows toast and clipboard contains edited text. Regression: explore-* links open /properties?listing_type=buy with 9 results; Estate Mitra chat opens and replies sensibly.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [
+      {"flow": "Admin lead requirements", "issue": "Lead TEST_V4Chat shows Budget 'Up to ₹15 crore' while AI summary says 'under ₹1.5 crore' — budget extraction appears off by 10x for '1.5 crore' style input (pre-existing, not part of this fix)", "affected_selectors": ["lead detail Requirements > Budget"]}
+    ],
+    "design_issues": [
+      {"screen": "Admin lead detail", "issues": ["Follow-up date uses native browser date picker (mm/dd/yyyy) instead of shadcn Calendar/Popover", "Edited WhatsApp message is local state only; not persisted after closing drawer (acceptable if intended)"]}
+    ]
+  },
+  "test_report_links": [],
+  "action_items": [
+    "Optional: verify budget parsing for decimal crore values (e.g. '1.5 crore' -> 15 crore shown)",
+    "Optional: replace native date input in LeadDetail follow-up date with shadcn Calendar"
+  ],
+  "critical_code_review_comments": [
+    "LeadDetail wa.me link hardcodes '91' + lead.phone; fine since backend normalize_phone stores 10 digits, but would break if phone ever stored with country code.",
+    "Mobile sticky WhatsApp link lacked data-testid; added data-testid='mobile-sticky-whatsapp'."
+  ],
+  "updated_files": ["/app/frontend/src/pages/PropertyPage.jsx (added data-testid mobile-sticky-whatsapp)"],
+  "success_rate": {"backend": "N/A (skipped)", "frontend": "100%"},
+  "test_credentials": "admin@urbannest.in / UrbanNest@2026 (works)",
+  "seed_data_creation": "None. Edited WhatsApp textarea on lead TEST_V4Chat locally only (not saved).",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "window.open stubbed via add_init_script to capture wa.me URLs; real popup check via context.expect_page works. WhatsApp number 918920785645 from REACT_APP_WHATSAPP_NUMBER."
+}
