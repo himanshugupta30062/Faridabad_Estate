@@ -51,7 +51,7 @@ export const ChatWidget = () => {
   const [busy, setBusy] = useState(false);
   const [leadSaved, setLeadSaved] = useState(false);
   const [configured, setConfigured] = useState(true);
-  const sid = useRef(localStorage.getItem(SID_KEY));
+  const sid = useRef(sessionStorage.getItem(SID_KEY));
   const endRef = useRef(null);
 
   useEffect(() => {
@@ -96,7 +96,7 @@ export const ChatWidget = () => {
           const ev = JSON.parse(part.slice(6));
           if (ev.type === "meta") {
             sid.current = ev.session_id;
-            localStorage.setItem(SID_KEY, ev.session_id);
+            sessionStorage.setItem(SID_KEY, ev.session_id);
             patchLast((m) => ({ ...m, matches: ev.matches }));
           } else if (ev.type === "delta") patchLast((m) => ({ ...m, content: m.content + ev.content }));
           else if (ev.type === "done") setLeadSaved(ev.lead_saved);
@@ -116,7 +116,7 @@ export const ChatWidget = () => {
   }, [send]);
 
   const reset = () => {
-    localStorage.removeItem(SID_KEY);
+    sessionStorage.removeItem(SID_KEY);
     sid.current = null;
     setLeadSaved(false);
     setMessages([{ role: "assistant", content: GREETING }]);

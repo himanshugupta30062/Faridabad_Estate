@@ -20,7 +20,7 @@ const Carousel = ({ p }) => {
           <button onClick={go(-1)} aria-label="Previous photo" className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/90 flex items-center justify-center opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity" data-testid={`card-prev-${p.id}`}><ChevronLeft className="w-4 h-4" /></button>
           <button onClick={go(1)} aria-label="Next photo" className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/90 flex items-center justify-center opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity" data-testid={`card-next-${p.id}`}><ChevronRight className="w-4 h-4" /></button>
           <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1">
-            {imgs.map((_, k) => <span key={k} className={`h-1.5 rounded-full transition-all ${k === i ? "w-4 bg-white" : "w-1.5 bg-white/60"}`} />)}
+            {imgs.map((src, k) => <span key={src} className={`h-1.5 rounded-full transition-all ${k === i ? "w-4 bg-white" : "w-1.5 bg-white/60"}`} />)}
           </div>
         </>
       )}

@@ -33,9 +33,11 @@ export default function SavedPage() {
     <div className="max-w-7xl mx-auto px-4 sm:px-8 lg:px-12 py-12" data-testid="saved-page">
       <Seo title="Saved homes | Faridabad Estates" description="Your saved Faridabad properties." />
       <h1 className="font-serif text-4xl">Saved homes</h1>
-      {items === null ? <p className="text-[#55524D] mt-6">Loading…</p> : active.length ? (
+      {items === null && <p className="text-[#55524D] mt-6">Loading…</p>}
+      {items !== null && active.length > 0 && (
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">{active.map((p) => <ListingCard key={p.id} p={p} />)}</div>
-      ) : (
+      )}
+      {items !== null && active.length === 0 && (
         <div className="border border-dashed border-[#D8D2C4] rounded-xl p-10 text-center mt-8" data-testid="saved-empty">
           <p className="font-serif text-2xl">No saved homes yet</p><p className="text-sm text-[#55524D] mt-2">Tap the heart on any property to keep it here.</p>
           <Link to="/properties" className="btn-dark rounded-full h-11 px-6 inline-flex items-center mt-6">Browse properties</Link>

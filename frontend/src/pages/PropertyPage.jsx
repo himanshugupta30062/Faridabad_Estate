@@ -79,7 +79,7 @@ export default function PropertyPage() {
         <nav aria-label="Breadcrumb" className="text-xs text-[#8a8579]"><Link to="/" className="hover:underline">Home</Link> / <Link to={`/properties?listing_type=${p.listing_type}`} className="hover:underline">{p.listing_type === "rent" ? "Rent" : "Buy"}</Link> / {p.location}</nav>
         <div className="grid grid-cols-4 grid-rows-2 gap-2 mt-4 h-[42vh] sm:h-[58vh] rounded-xl overflow-hidden" data-testid="property-gallery">
           {imgs.slice(0, 3).map((src, i) => (
-            <button key={i} onClick={() => setLb(i)} aria-label={`Open photo ${i + 1}`} className={`relative overflow-hidden bg-[#E8E4DC] ${i === 0 ? "col-span-4 sm:col-span-3 row-span-2" : "hidden sm:block"}`} data-testid={`gallery-image-${i}`}>
+            <button key={src} onClick={() => setLb(i)} aria-label={`Open photo ${i + 1}`} className={`relative overflow-hidden bg-[#E8E4DC] ${i === 0 ? "col-span-4 sm:col-span-3 row-span-2" : "hidden sm:block"}`} data-testid={`gallery-image-${i}`}>
               <img src={imageSrc(src)} alt={`${p.title} photo ${i + 1}`} loading={i ? "lazy" : "eager"} className="w-full h-full object-cover hover:scale-[1.02] transition-transform duration-700" />
             </button>
           ))}

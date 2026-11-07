@@ -189,12 +189,12 @@ async def stats():
         "top_locations": [{"location": k, "count": v} for k, v in locs.most_common(6)],
         "budget_distribution": [{"bucket": b, "count": buckets[b]} for b in order if buckets.get(b)],
         "active_listings": await db.properties.count_documents({"is_active": True}),
-        "sources": [{"source": k, "count": v} for k, v in Counter(SOURCE_LABELS.get(l.get("source"), l.get("source") or "Other") for l in leads).most_common()],
-        "status": dict(Counter(l.get("status") or "New" for l in leads)),
-        "recent": [{k: l.get(k) for k in ["id", "name", "intent", "location", "temperature", "created_at", "source"]} for l in leads[:5]],
+        "sources": [{"source": k, "count": v} for k, v in Counter(SOURCE_LABELS.get(ld.get("source"), ld.get("source") or "Other") for ld in leads).most_common()],
+        "status": dict(Counter(ld.get("status") or "New" for ld in leads)),
+        "recent": [{k: ld.get(k) for k in ["id", "name", "intent", "location", "temperature", "created_at", "source"]} for ld in leads[:5]],
         "property_performance": await property_performance(leads),
-        "follow_ups": sorted([{k: l.get(k) for k in ["id", "name", "phone", "follow_up_date", "status", "temperature"]}
-                              for l in leads if l.get("follow_up_date") and l.get("status") not in ("Closed", "Lost")],
+        "follow_ups": sorted([{k: ld.get(k) for k in ["id", "name", "phone", "follow_up_date", "status", "temperature"]}
+                              for ld in leads if ld.get("follow_up_date") and ld.get("status") not in ("Closed", "Lost")],
                              key=lambda x: x["follow_up_date"])[:8],
     }
 

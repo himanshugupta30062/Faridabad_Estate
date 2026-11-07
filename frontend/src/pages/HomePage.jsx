@@ -89,6 +89,14 @@ const HeroSearch = () => {
   );
 };
 
+function hoodSummary(n) {
+  if (!n.listings) return "Enquire for options";
+  let s = `${n.listings} listing${n.listings > 1 ? "s" : ""}`;
+  if (n.min_buy_price) s += ` · from ${formatPrice(n.min_buy_price)}`;
+  else if (n.min_rent) s += ` · from ${formatPrice(n.min_rent, "rent")}`;
+  return s;
+}
+
 const Head = ({ eyebrow, title, action, dark }) => (
   <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-10">
     <div><p className={`eyebrow ${dark ? "!text-[#e3c77a]" : ""}`}>{eyebrow}</p><h2 className={`font-serif text-3xl sm:text-4xl mt-3 max-w-xl ${dark ? "text-white" : ""}`}>{title}</h2></div>
@@ -161,7 +169,7 @@ export default function HomePage() {
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
                 <div className="absolute bottom-0 p-4 sm:p-6 text-white">
                   <p className={`font-serif ${i === 0 ? "text-3xl" : "text-xl"}`}>{n.name}</p>
-                  <p className="text-xs text-white/75 mt-1">{n.listings ? `${n.listings} listing${n.listings > 1 ? "s" : ""}${n.min_buy_price ? ` · from ${formatPrice(n.min_buy_price)}` : n.min_rent ? ` · from ${formatPrice(n.min_rent, "rent")}` : ""}` : "Enquire for options"}</p>
+                  <p className="text-xs text-white/75 mt-1">{hoodSummary(n)}</p>
                 </div>
               </Link>
             ))}
@@ -215,7 +223,7 @@ export default function HomePage() {
         <div>
           <div className="grid grid-cols-3 gap-4" data-testid="team-section">
             {TEAM.map((m, i) => (
-              <figure key={i}>
+              <figure key={m.role}>
                 <img src={m.img} alt={`${m.name}, ${m.role}`} loading="lazy" className="aspect-[3/4] w-full object-cover rounded-lg" />
                 <figcaption className="mt-3"><p className="text-sm font-medium">{m.name}</p><p className="text-xs text-[#55524D]">{m.role}</p></figcaption>
               </figure>
@@ -248,7 +256,7 @@ export default function HomePage() {
         <Head eyebrow="Client stories" title="What clients tell us" action={<span className="text-xs uppercase tracking-widest text-[#8a6d24] border border-[#c9a54c]/50 rounded-full px-3 py-1 self-start">Demo testimonials</span>} />
         <div className="grid md:grid-cols-3 gap-6">
           {TESTIMONIALS.map((t, i) => (
-            <figure key={i} className="border-t-2 border-[#111114] pt-6">
+            <figure key={t.role} className="border-t-2 border-[#111114] pt-6">
               <Quote className="w-6 h-6 text-[#c9a54c]" /><blockquote className="font-serif text-xl leading-snug mt-4">“{t.text}”</blockquote>
               <figcaption className="text-sm text-[#55524D] mt-5">{t.name} · {t.role}</figcaption>
             </figure>
