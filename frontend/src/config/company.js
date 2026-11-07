@@ -6,8 +6,8 @@ export const COMPANY = {
   product: "Estate Mitra",
   tagline: "Find Your Place. Build Your Future.",
   city: "Faridabad",
-  phoneDisplay: "+91 90000 00000",
-  phoneHref: "+919000000000",
+  phoneDisplay: "+91 89207 85645",
+  phoneHref: "+918920785645",
   // Set REACT_APP_WHATSAPP_NUMBER (country code + number, digits only, e.g. 919812345678) in frontend/.env
   whatsapp: (process.env.REACT_APP_WHATSAPP_NUMBER || "").replace(/\D/g, ""),
   email: "hello@urbannest.in",
