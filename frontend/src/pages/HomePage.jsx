@@ -216,12 +216,12 @@ export default function HomePage() {
           <div className="grid grid-cols-3 gap-4" data-testid="team-section">
             {TEAM.map((m, i) => (
               <figure key={i}>
-                <img src={m.img} alt="Placeholder advisor portrait" loading="lazy" className="aspect-[3/4] w-full object-cover rounded-lg" />
+                <img src={m.img} alt={`${m.name}, ${m.role}`} loading="lazy" className="aspect-[3/4] w-full object-cover rounded-lg" />
                 <figcaption className="mt-3"><p className="text-sm font-medium">{m.name}</p><p className="text-xs text-[#55524D]">{m.role}</p></figcaption>
               </figure>
             ))}
           </div>
-          <p className="text-xs text-[#8a8579] mt-4">Team profiles are placeholders — replace with genuine Faridabad Estates advisors.</p>
+          <p className="text-xs text-[#8a8579] mt-4">Sample team profiles for illustration.</p>
         </div>
       </section>
 

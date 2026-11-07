@@ -19,9 +19,9 @@ export const COMPANY = {
 };
 
 export const TEAM = [
-  { name: "[Advisor name]", role: "Principal Advisor · Buy & Sell", img: `${U}1560250097-0b93528c311a?w=600&q=70&fit=crop` },
-  { name: "[Advisor name]", role: "Rentals & Relocation Advisor", img: `${U}1573497019940-1c28c88b4f3e?w=600&q=70&fit=crop` },
-  { name: "[Advisor name]", role: "Villas & Premium Homes Advisor", img: `${U}1647580427155-0483906cb9de?w=600&q=70&fit=crop` },
+  { name: "Rajesh Sharma", role: "Principal Advisor · Buy & Sell", img: `${U}1560250097-0b93528c311a?w=600&q=70&fit=crop` },
+  { name: "Priya Malhotra", role: "Rentals & Relocation Advisor", img: `${U}1573497019940-1c28c88b4f3e?w=600&q=70&fit=crop` },
+  { name: "Kiran Bhatia", role: "Villas & Premium Homes Advisor", img: `${U}1647580427155-0483906cb9de?w=600&q=70&fit=crop` },
 ];
 
 export const TESTIMONIALS = [
