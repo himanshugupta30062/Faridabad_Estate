@@ -9,7 +9,7 @@ import { Seo } from "@/components/site/Seo";
 export default function AccountAuth({ mode }) {
   const { user, setUser } = useAuth();
   const [sp] = useSearchParams();
-  const next = sp.get("next") || "/saved";
+  const next = sp.get("next") || "/";
   const [f, setF] = useState({ name: "", email: "", password: "" });
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);

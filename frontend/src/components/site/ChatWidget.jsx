@@ -35,6 +35,16 @@ const Bubble = ({ m }) => (
 
 export const ChatWidget = () => {
   const onProperty = useLocation().pathname.startsWith("/property/");
+  const [showLabel, setShowLabel] = useState(true);
+  useEffect(() => {
+    // Label collapses to an icon after a few seconds, then reappears briefly every 30s
+    let hide = setTimeout(() => setShowLabel(false), 5000);
+    const tick = setInterval(() => {
+      setShowLabel(true);
+      hide = setTimeout(() => setShowLabel(false), 4000);
+    }, 30000);
+    return () => { clearTimeout(hide); clearInterval(tick); };
+  }, []);
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState([{ role: "assistant", content: GREETING }]);
   const [input, setInput] = useState("");
@@ -115,8 +125,9 @@ export const ChatWidget = () => {
   return (
     <>
       {!open && (
-        <button onClick={() => setOpen(true)} className={`fixed ${onProperty ? "bottom-20" : "bottom-4"} lg:bottom-5 right-4 sm:right-5 z-50 btn-gold rounded-full px-4 sm:pl-4 sm:pr-5 h-12 sm:h-14 flex items-center gap-2 shadow-2xl font-medium`} data-testid="chat-open-button">
-          <Sparkles className="w-5 h-5" /> <span className="hidden sm:inline">Ask Estate Mitra</span>
+        <button onClick={() => setOpen(true)} aria-label="Ask Estate Mitra" className={`group fixed ${onProperty ? "bottom-20" : "bottom-4"} lg:bottom-5 right-4 sm:right-5 z-50 btn-gold rounded-full px-[14px] sm:px-[18px] h-12 sm:h-14 flex items-center shadow-2xl font-medium`} data-testid="chat-open-button">
+          <Sparkles className="w-5 h-5 shrink-0" />
+          <span className={`hidden sm:inline-block overflow-hidden whitespace-nowrap transition-[max-width,opacity,margin] duration-500 group-hover:max-w-[160px] group-hover:opacity-100 group-hover:ml-2 ${showLabel ? "max-w-[160px] opacity-100 ml-2" : "max-w-0 opacity-0 ml-0"}`} data-testid="chat-open-label">Ask Estate Mitra</span>
         </button>
       )}
       {open && (

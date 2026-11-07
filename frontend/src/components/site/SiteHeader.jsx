@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, NavLink } from "react-router-dom";
+import { Link, NavLink, useLocation } from "react-router-dom";
 import { Menu, Sparkles, Heart, GitCompare, User } from "lucide-react";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { openChat } from "@/lib/api";
@@ -29,6 +29,8 @@ export const SiteHeader = () => {
   const [open, setOpen] = useState(false);
   const { user, logout } = useAuth();
   const compare = useLocalList(KEYS.compare);
+  const { pathname } = useLocation();
+  const loginTo = `/login?next=${encodeURIComponent(pathname === "/login" || pathname === "/register" ? "/" : pathname)}`;
   const link = "text-sm text-[#2b2a27] hover:text-[#8a6d24] transition-colors";
   return (
     <header className="sticky top-0 z-40 bg-[#FAF9F6]/95 backdrop-blur border-b border-[#E5E1D8]" data-testid="site-header">
@@ -46,7 +48,7 @@ export const SiteHeader = () => {
           {user ? (
             <button onClick={logout} className="hidden sm:flex items-center gap-1.5 text-sm px-3 h-10 rounded-full hover:bg-[#F0ECE3]" data-testid="nav-logout"><User className="w-4 h-4" />{user.name?.split(" ")[0] || "Account"} · Sign out</button>
           ) : (
-            <Link to="/login" className="hidden sm:flex items-center gap-1.5 text-sm px-3 h-10 rounded-full hover:bg-[#F0ECE3]" data-testid="nav-login"><User className="w-4 h-4" />Sign in</Link>
+            <Link to={loginTo} className="hidden sm:flex items-center gap-1.5 text-sm px-3 h-10 rounded-full hover:bg-[#F0ECE3]" data-testid="nav-login"><User className="w-4 h-4" />Sign in</Link>
           )}
           <button onClick={() => openChat()} className="hidden md:flex btn-dark rounded-full px-4 h-10 text-sm items-center gap-2" data-testid="nav-ask-ai-button"><Sparkles className="w-4 h-4 text-[#e3c77a]" />Ask Estate Mitra</button>
           <button className="lg:hidden w-10 h-10 flex items-center justify-center" onClick={() => setOpen(true)} aria-label="Open menu" data-testid="nav-mobile-toggle"><Menu /></button>
@@ -60,7 +62,7 @@ export const SiteHeader = () => {
               <Link key={n.label} to={n.to} onClick={() => setOpen(false)} className="py-3 border-b border-[#E5E1D8] text-[#111114]">{n.label}</Link>
             ))}
             {user ? <button onClick={() => { logout(); setOpen(false); }} className="py-3 text-left">Sign out</button>
-              : <Link to="/login" onClick={() => setOpen(false)} className="py-3">Sign in / Create account</Link>}
+              : <Link to={loginTo} onClick={() => setOpen(false)} className="py-3">Sign in / Create account</Link>}
             <button onClick={() => { setOpen(false); openChat(); }} className="btn-dark rounded-full h-11 mt-4 flex items-center justify-center gap-2"><Sparkles className="w-4 h-4" />Ask Estate Mitra</button>
           </nav>
         </SheetContent>
