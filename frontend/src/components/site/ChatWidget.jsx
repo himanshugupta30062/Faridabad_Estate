@@ -45,8 +45,7 @@ export const ChatWidget = () => {
     fetch(`${API}/chat/${sid.current}`).then((r) => (r.ok ? r.json() : null)).then((d) => {
       if (!d) return;
       setLeadSaved(d.lead_saved);
-      const byId = Object.fromEntries((d.matches || []).map((p) => [p.id, p]));
-      setMessages(d.messages.map((m) => ({ role: m.role, content: m.content, matches: (m.match_ids || []).map((id) => byId[id]).filter(Boolean) })));
+      setMessages(d.messages.map((m) => ({ role: m.role, content: m.content, matches: m.matches || [] })));
     }).catch(() => {});
   }, []);
 
@@ -105,7 +104,7 @@ export const ChatWidget = () => {
   return (
     <>
       {!open && (
-        <button onClick={() => setOpen(true)} className="fixed bottom-5 right-5 z-50 btn-gold rounded-full pl-4 pr-5 h-14 flex items-center gap-2 shadow-2xl font-medium" data-testid="chat-open-button">
+        <button onClick={() => setOpen(true)} className="fixed bottom-4 right-4 sm:bottom-5 sm:right-5 z-50 btn-gold rounded-full px-4 sm:pl-4 sm:pr-5 h-12 sm:h-14 flex items-center gap-2 shadow-2xl font-medium" data-testid="chat-open-button">
           <Sparkles className="w-5 h-5" /> <span className="hidden sm:inline">Ask Property Mitra</span>
         </button>
       )}

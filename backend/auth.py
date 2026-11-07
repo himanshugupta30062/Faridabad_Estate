@@ -98,7 +98,8 @@ class LoginIn(BaseModel):
 @router.post("/login")
 async def login(body: LoginIn, request: Request, response: Response):
     email = body.email.lower()
-    ip = request.client.host if request.client else "unknown"
+    fwd = request.headers.get("x-forwarded-for", "")
+    ip = fwd.split(",")[0].strip() if fwd else (request.client.host if request.client else "unknown")
     ident = f"{ip}:{email}"
     attempt = await db.login_attempts.find_one({"identifier": ident})
     now = datetime.now(timezone.utc)

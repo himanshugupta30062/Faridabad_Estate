@@ -82,6 +82,9 @@ STRICT RULES:
 - Describe a listing only using fields present in its data. Never invent availability, approvals (RERA etc.), amenities, specifications, discounts or prices. If asked about something not in the data, say the advisor will confirm it.
 - All listings shown are sample listings for demonstration.
 - Do not process payments, legal verification or transactions.
+- If MATCHING_LISTINGS is [] (an empty list), immediately and honestly say no current listing matches, then offer a callback and ask for name and phone (or suggest relaxing budget/location).
+- Greet only once; never restart with "Namaste" or re-introduce yourself mid-conversation.
+- Never ask again for anything already in COLLECTED, and do not ask about preferences that a recommended listing already answers.
 - Do not output JSON or markdown tables. Plain text with short line breaks only."""
 
 
@@ -207,6 +210,8 @@ async def chat_stream(body: ChatIn):
         extracted = {}
     req = merge_requirements(s.get("requirements") or {}, extracted)
     matches = await find_matches(req)
+    prev_ids = [m["id"] for m in s.get("matches") or []]
+    shown = matches if matches and [m["id"] for m in matches] != prev_ids else []
     phone_ok = normalize_phone(req.get("phone"))
     phone_invalid = bool(req.get("phone")) and not phone_ok
     can_save = bool(req.get("intent") and req.get("name") and phone_ok)
@@ -221,7 +226,7 @@ async def chat_stream(body: ChatIn):
               f"PHONE_INVALID: {phone_invalid} (if true, politely ask for a valid 10-digit Indian mobile number)")
 
     async def gen():
-        yield f"data: {json.dumps({'type': 'meta', 'session_id': sid, 'matches': matches or [], 'lead_saved': can_save})}\n\n"
+        yield f"data: {json.dumps({'type': 'meta', 'session_id': sid, 'matches': shown, 'lead_saved': can_save})}\n\n"
         reply = ""
         try:
             chat = llm(f"reply-{uuid.uuid4().hex}", system)
@@ -238,8 +243,9 @@ async def chat_stream(body: ChatIn):
                 reply = "Sorry, I'm having trouble right now. Please share your name and phone and an UrbanNest advisor will call you back."
                 yield f"data: {json.dumps({'type': 'delta', 'content': reply})}\n\n"
         all_msgs = messages + [{"role": "assistant", "content": reply, "ts": now_iso(),
-                                "match_ids": [m["id"] for m in matches or []]}]
-        update = {"messages": all_msgs, "requirements": req, "matches": matches or [], "updated_at": now_iso()}
+                                "matches": shown}]
+        update = {"messages": all_msgs, "requirements": req, "matches": matches if matches is not None else (s.get("matches") or []),
+                  "updated_at": now_iso()}
         lead_id = s.get("lead_id")
         if can_save:
             lead = build_lead_fields(req, matches)

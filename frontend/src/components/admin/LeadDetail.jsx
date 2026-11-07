@@ -6,9 +6,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { api, formatApiError, formatPrice, imageSrc } from "@/lib/api";
 import { TempBadge, fmtDate } from "./leadUtils";
 
-const Row = ({ k, v }) => (
+const Row = ({ k, v, cap }) => (
   <div className="flex justify-between gap-4 py-2 border-b border-white/5 text-sm">
-    <span className="text-zinc-500">{k}</span><span className="text-white text-right capitalize">{v || "—"}</span>
+    <span className="text-zinc-500">{k}</span><span className={`text-white text-right ${cap ? "capitalize" : ""}`}>{v || "—"}</span>
   </div>
 );
 
@@ -73,7 +73,7 @@ export const LeadDetail = ({ id, onClose, onChanged }) => {
             </Section>
 
             <Section title="Requirements">
-              <Row k="Intent" v={lead.intent} /><Row k="Location" v={lead.location} /><Row k="Budget" v={lead.budget_label} />
+              <Row k="Intent" v={lead.intent} cap /><Row k="Location" v={lead.location} /><Row k="Budget" v={lead.budget_label} />
               <Row k="Property type" v={lead.property_type} /><Row k="Bedrooms" v={lead.bedrooms && `${lead.bedrooms} BHK`} /><Row k="Possession" v={lead.possession} />
             </Section>
 

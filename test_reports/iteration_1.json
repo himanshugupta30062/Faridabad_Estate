@@ -1,0 +1,45 @@
+{
+  "summary": "First full E2E run of PropMitra (backend pytest with 21 tests + Playwright UI). Everything requested works: public filters, property dialog, enquiry form, chat SSE flow with matching, lead save and restore, admin auth and dashboard, leads, and listings CRUD, upload and deactivate (removed from both the public site and chat matching), plus 390px mobile. There is one real bug: brute-force lockout doesn't work behind the ingress. The rest are minor UX and LLM-behaviour nits.",
+  "backend_issues": {
+    "critical": [
+      {"endpoint": "POST /api/auth/login", "issue": "Brute-force lockout is ineffective. The identifier uses request.client.host, which is the ingress pod IP and varies per request (seen 10.208.133.66 and 10.208.133.69). Failed attempts get split across several counters, so the 6th wrong attempt still returned 401 instead of 429. When requests do share an IP, all users behind the same ingress pod share a counter. Fix: key the lockout on email only, or use the first IP in X-Forwarded-For.", "priority": "HIGH"}
+    ],
+    "minor": [
+      {"endpoint": "POST /api/chat/stream", "issue": "No-match case: on the first turn with intent+location+budget (rent 2 BHK Kokapet <20k), MATCHING_LISTINGS=[], but the LLM still asks for property type instead of saying there's no match. It only says so honestly and offers a callback on the next turn. It never invents listings. Consider a stronger system instruction, e.g. 'if MATCHING_LISTINGS is [] say so immediately'."},
+      {"endpoint": "POST /api/chat/stream", "issue": "The reply sometimes restarts with 'Namaste!' mid-conversation. Also, after saying a listing is ready to move, it asked 'Is ready-to-move fine for you?'. These are prompt-quality nits."},
+      {"endpoint": "CORS", "issue": "CORS_ORIGINS='*' with allow_credentials=True. This works because Starlette echoes the origin, but the playbook expects explicit origins."}
+    ]
+  },
+  "frontend_issues": {
+    "ui_bugs": [
+      {"component": "ChatWidget", "issue": "The match card is shown again under every later assistant message while matches persist, e.g. under the 'Thank you, advisor will call' message. After a reload the same card appears twice in the transcript.", "selector": "[data-testid^=chat-match-]", "priority": "LOW"},
+      {"component": "LeadDetail Row", "issue": "The 'capitalize' class turns values into title case: 'Up To ₹1.3 Crore', 'Ready To Move'. Apply capitalize only to Intent.", "selector": "[data-testid=lead-detail]", "priority": "LOW"}
+    ],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "Home mobile 390px", "issues": ["The floating chat button (bottom-right) sits very close to or slightly over the filter reset button when the filters are at the bottom of the viewport."]}
+    ]
+  },
+  "test_report_links": ["/app/backend/tests/test_propmitra_api.py", "/app/backend/tests/chat_nomatch_probe.py", "/app/backend/tests/chat_inactive_probe.py", "/app/test_reports/pytest/pytest_results.xml"],
+  "action_items": [
+    "Fix the login lockout identifier (use email, or X-Forwarded-For) so 5 failed attempts lead to 429 behind the ingress",
+    "Tighten the chat prompt so an empty MATCHING_LISTINGS result triggers an immediate honest no-match message and a callback offer",
+    "Show chat match cards only on the message where they first appear, or when the matches change",
+    "Remove the capitalize class from requirement values in LeadDetail (keep it for intent)",
+    "Optional: set explicit CORS_ORIGINS"
+  ],
+  "critical_code_review_comments": [
+    "auth.py login: request.client.host behind the k8s ingress is not the client IP, so the lockout is unreliable",
+    "No DELETE endpoints for leads or listings. That may be by design (deactivate only), but test or spam data can't be cleaned up from the UI",
+    "Leads list is capped at to_list(500) with no pagination, and stats loads up to 10000 leads into memory. Fine for an MVP",
+    "Each chat turn makes 2 LLM calls (extraction then reply), so latency is about 5-10 s. Acceptable, and the streaming UX hides it",
+    "seed_admin correctly leaves an existing admin's password unchanged, and bcrypt hashes start with $2b$. httpOnly, secure, samesite=None cookies are set as expected"
+  ],
+  "updated_files": ["/app/backend/tests/test_propmitra_api.py", "/app/backend/tests/chat_nomatch_probe.py", "/app/backend/tests/chat_inactive_probe.py"],
+  "success_rate": {"backend": "95% (20/21; only the lockout test fails)", "frontend": "100% of requested flows"},
+  "seed_data_creation": "Created TEST_ leads (4) and TEST_ listings (2) and deleted them afterwards by id. Kondapur Greens was deactivated for a test and then restored; all 8 sample listings are active. The Ravi Kumar lead was left untouched.",
+  "retest_needed": false,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "Run: cd /app/backend && REACT_APP_BACKEND_URL=<url> python -m pytest tests/test_propmitra_api.py (pytest.ini uses xdist). test_leads_filter_search_patch depends on the TEST_Enquiry lead from TestEnquiry; under xdist it can run first and fail, so rerun it alone if needed. Kondapur Greens id: 91e5eec8-6456-4c51-ba08-4673a7fcac5d. Chat sessions created during the tests remain in chat_sessions (harmless).",
+  "rca of the issue": "Lockout: an identifier of f'{ip}:{email}' with ip=request.client.host. Behind the Kubernetes ingress, client.host is an ingress or proxy pod IP that changes between requests, so the attempt counts were split (DB showed count 4 and count 2 under two IPs for the same email). Repro: send 6 bad logins for one email and observe all 401. Mitigation: key on email only, or on X-Forwarded-For's first entry plus email."
+}
