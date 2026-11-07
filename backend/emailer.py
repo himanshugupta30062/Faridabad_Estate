@@ -104,8 +104,9 @@ async def send_email(*, to: str, subject: str, html: str):
 
 async def send_lead_alert(lead: dict):
     """Fire-and-forget team alert for a new lead; recipient comes from server config only."""
-    to = os.environ.get("LEAD_ALERT_EMAIL")
-    if not to:
+    recipients = [e.strip() for e in (os.environ.get("LEAD_ALERT_EMAIL") or "").split(",") if e.strip()]
+    if not recipients:
+        log.warning("Hot lead alert skipped: LEAD_ALERT_EMAIL not configured")
         return
     rows = [("Name", lead.get("name")), ("Phone", lead.get("phone")), ("Intent", (lead.get("intent") or "").title()),
             ("Location", lead.get("location")), ("Budget", lead.get("budget_label")),
@@ -115,12 +116,17 @@ async def send_lead_alert(lead: dict):
                   f'{escape(str(v))}</td></tr>' for k, v in rows if v)
     brand = escape(os.environ["EMAIL_FROM_NAME"])
     html = (f'<table role="presentation" width="100%" style="font-family:Arial,sans-serif;background:#FAF9F6"><tr><td style="padding:24px">'
-            f'<p style="font-size:18px;color:#111;margin:0 0 12px">New {escape(lead.get("temperature") or "")} enquiry on PropMitra</p>'
+            f'<p style="font-size:18px;color:#111;margin:0 0 12px">New {escape(lead.get("temperature") or "")} enquiry on Faridabad Estates</p>'
             f'<table role="presentation" style="background:#fff;border:1px solid #E5E1D8">{trs}</table>'
             f'<p style="color:#333;font-size:14px;margin-top:16px">{escape(lead.get("summary") or "")}</p>'
-            f'<p style="font-size:12px;color:#888">Open the PropMitra admin dashboard to view the full enquiry. Sent by {brand}.</p>'
+            f'<p style="font-size:12px;color:#888">Open the Faridabad Estates admin dashboard to view the full enquiry. Sent by {brand}.</p>'
             f'</td></tr></table>')
     try:
-        await send_email(to=to, subject=f"New {lead.get('temperature') or ''} lead: {lead.get('name')}", html=html)
+        sent = False
+        for to in recipients:
+            sent = bool(await send_email(to=to, subject=f"HOT lead: {lead.get('name')} — {lead.get('location') or 'Faridabad'}", html=html)) or sent
+        if sent and lead.get("id"):
+            from db import db
+            await db.leads.update_one({"id": lead["id"]}, {"$set": {"hot_alert_sent": True}})
     except Exception as e:
         log.error("Lead alert failed: %s", e)

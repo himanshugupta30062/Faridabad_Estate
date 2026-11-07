@@ -94,7 +94,7 @@ export const ListingForm = ({ open, listing, onClose, onSaved }) => {
       <DialogContent className="max-w-2xl bg-[#1A1A22] border-white/10 max-h-[92vh] overflow-y-auto thin-scroll" data-testid="listing-form">
         <DialogHeader>
           <DialogTitle className="font-serif text-2xl text-white">{listing ? "Edit listing" : "Add listing"}</DialogTitle>
-          <DialogDescription className="text-zinc-500">Only enter verified details — Property Mitra uses this data to answer visitors.</DialogDescription>
+          <DialogDescription className="text-zinc-500">Only enter verified details — Estate Mitra uses this data to answer visitors.</DialogDescription>
         </DialogHeader>
         <div className="grid sm:grid-cols-2 gap-4">
           <div className="sm:col-span-2"><L label="Title" error={errors.title}><Input value={f.title} onChange={set("title")} className={cls} data-testid="listing-title-input" /></L></div>

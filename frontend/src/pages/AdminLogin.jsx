@@ -47,15 +47,15 @@ export default function AdminLogin() {
         <img src="https://images.unsplash.com/photo-1635108201018-94bbbfac4a79?crop=entropy&cs=srgb&fm=jpg&w=1400&q=80" alt="" className="absolute inset-0 w-full h-full object-cover" />
         <div className="absolute inset-0 bg-[#0F0F12]/60" />
         <div className="absolute bottom-12 left-12 right-12">
-          <p className="font-serif text-4xl text-white">PropMitra Admin</p>
-          <p className="text-zinc-300 mt-3">Leads, insights and listings for UrbanNest Properties.</p>
+          <p className="font-serif text-4xl text-white">Faridabad Estates Admin</p>
+          <p className="text-zinc-300 mt-3">Leads, insights and listings for Faridabad Estates.</p>
         </div>
       </div>
       <div className="flex items-center justify-center p-6">
         <div className="w-full max-w-sm">
           <Link to="/" className="text-sm text-zinc-500 hover:text-white flex items-center gap-1" data-testid="login-back-link"><ArrowLeft className="w-4 h-4" /> Back to website</Link>
           <h1 className="font-serif text-3xl text-white mt-8">Admin sign in</h1>
-          <p className="text-zinc-500 text-sm mt-2">Authorised UrbanNest staff only.</p>
+          <p className="text-zinc-500 text-sm mt-2">Authorised Faridabad Estates staff only.</p>
           <form onSubmit={submit} className="space-y-4 mt-8" noValidate>
             <Input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} className="bg-white/5 border-white/10 text-white h-11" data-testid="login-email-input" />
             <Input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} className="bg-white/5 border-white/10 text-white h-11" data-testid="login-password-input" />

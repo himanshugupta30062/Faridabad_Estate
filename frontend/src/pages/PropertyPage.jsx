@@ -5,6 +5,7 @@ import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { api, formatApiError, formatPrice, imageSrc, openChat, configLabel } from "@/lib/api";
 import { pushRecent } from "@/lib/local";
 import { COMPANY, AGENT } from "@/config/company";
+import { openWhatsApp } from "@/components/site/SiteLayout";
 import { FavButton, CompareButton, ShareButton } from "@/components/site/PropertyActions";
 import { ListingCard, DemoBadge } from "@/components/site/ListingCard";
 import { PropertyMap } from "@/components/site/PropertyMap";
@@ -65,14 +66,15 @@ export default function PropertyPage() {
   const imgs = p.images?.length ? p.images : [p.image_url];
   const price = formatPrice(p.price, p.listing_type);
   const url = `${window.location.origin}/property/${p.slug}`;
-  const wa = `https://wa.me/${COMPANY.whatsapp}?text=${encodeURIComponent(`Hi UrbanNest, I'm interested in ${p.title} (${price}, ${p.location}). Ref: ${p.id.slice(0, 8)} ${url}`)}`;
+  const waText = `Hi Faridabad Estates, I'm interested in ${p.title} (${price}, ${p.location}). Ref: ${p.id.slice(0, 8)} ${url}`;
+  const wa = (e) => { e.preventDefault(); openWhatsApp(waText); };
   const jsonLd = { "@context": "https://schema.org", "@type": "RealEstateListing", name: p.title, description: p.description, url, image: imgs.slice(0, 4).map(imageSrc),
     offers: { "@type": "Offer", price: p.price, priceCurrency: "INR" }, address: { "@type": "PostalAddress", addressLocality: `${p.location}, Faridabad`, addressRegion: "Haryana", addressCountry: "IN" } };
   const toForm = () => document.getElementById("enquire")?.scrollIntoView({ behavior: "smooth" });
 
   return (
     <article className="pb-24 lg:pb-0" data-testid="property-page">
-      <Seo title={`${p.title}, ${p.location} — ${price} | PropMitra`} description={`SAMPLE ${p.property_type === "Plot" ? "" : configLabel(p) + " "}${p.property_type.toLowerCase()} ${p.listing_type === "rent" ? "for rent" : "for sale"} in ${p.location}, Faridabad. ${p.area_sqft} sq.ft. ${p.description.slice(0, 110)}`} jsonLd={jsonLd} />
+      <Seo title={`${p.title}, ${p.location} — ${price} | Faridabad Estates`} description={`SAMPLE ${p.property_type === "Plot" ? "" : configLabel(p) + " "}${p.property_type.toLowerCase()} ${p.listing_type === "rent" ? "for rent" : "for sale"} in ${p.location}, Faridabad. ${p.area_sqft} sq.ft. ${p.description.slice(0, 110)}`} jsonLd={jsonLd} />
       <div className="max-w-7xl mx-auto px-4 sm:px-8 lg:px-12 pt-6">
         <nav aria-label="Breadcrumb" className="text-xs text-[#8a8579]"><Link to="/" className="hover:underline">Home</Link> / <Link to={`/properties?listing_type=${p.listing_type}`} className="hover:underline">{p.listing_type === "rent" ? "Rent" : "Buy"}</Link> / {p.location}</nav>
         <div className="grid grid-cols-4 grid-rows-2 gap-2 mt-4 h-[42vh] sm:h-[58vh] rounded-xl overflow-hidden" data-testid="property-gallery">
@@ -123,7 +125,7 @@ export default function PropertyPage() {
             </section>
           )}
           <button onClick={() => openChat(`Tell me more about ${p.title} in ${p.location} (ref ${p.id}).`)} className="mt-10 w-full text-left bg-[#111114] text-white rounded-xl p-6 flex items-center gap-4 hover:bg-[#1f1f24] transition-colors" data-testid="property-ask-ai">
-            <Sparkles className="w-6 h-6 text-[#e3c77a] shrink-0" /><span><span className="block font-medium">Questions about this home?</span><span className="text-sm text-white/60">Ask Property Mitra — answers come only from this listing's details.</span></span>
+            <Sparkles className="w-6 h-6 text-[#e3c77a] shrink-0" /><span><span className="block font-medium">Questions about this home?</span><span className="text-sm text-white/60">Ask Estate Mitra — answers come only from this listing's details.</span></span>
           </button>
         </div>
 
@@ -134,7 +136,7 @@ export default function PropertyPage() {
               <div><p className="font-medium">{AGENT.name}</p><p className="text-xs text-[#55524D]">{AGENT.role}</p></div>
             </div>
             <div className="grid grid-cols-2 gap-2 mt-5">
-              <a href={wa} target="_blank" rel="noreferrer" className="h-11 rounded-md bg-[#1f7a4d] text-white text-sm flex items-center justify-center gap-2 hover:bg-[#186640]" data-testid="property-whatsapp"><MessageCircle className="w-4 h-4" />WhatsApp</a>
+              <a href="#whatsapp" onClick={wa} className="h-11 rounded-md bg-[#1f7a4d] text-white text-sm flex items-center justify-center gap-2 hover:bg-[#186640]" data-testid="property-whatsapp"><MessageCircle className="w-4 h-4" />WhatsApp</a>
               <a href={`tel:${COMPANY.phoneHref}`} className="btn-line h-11 rounded-md text-sm flex items-center justify-center gap-2" data-testid="property-call"><Phone className="w-4 h-4" />Call</a>
             </div>
             <div className="mt-6"><EnquiryForm property={p} compact types={["visit", "tour", "callback"]} /></div>
@@ -150,7 +152,7 @@ export default function PropertyPage() {
       )}
 
       <div className="lg:hidden fixed bottom-0 inset-x-0 z-30 bg-white border-t border-[#E5E1D8] p-3 flex gap-2" data-testid="mobile-sticky-cta">
-        <a href={wa} target="_blank" rel="noreferrer" className="h-12 w-12 rounded-md bg-[#1f7a4d] text-white flex items-center justify-center" aria-label="WhatsApp enquiry"><MessageCircle className="w-5 h-5" /></a>
+        <a href="#whatsapp" onClick={wa} className="h-12 w-12 rounded-md bg-[#1f7a4d] text-white flex items-center justify-center" aria-label="WhatsApp enquiry"><MessageCircle className="w-5 h-5" /></a>
         <button onClick={toForm} className="btn-dark h-12 rounded-md flex-1 font-medium" data-testid="mobile-request-visit">Request a visit</button>
       </div>
       <Lightbox imgs={imgs} index={lb} setIndex={setLb} title={p.title} />

@@ -58,7 +58,7 @@ def budget_label(req):
     return ""
 
 
-EXTRACT_SYSTEM = """You extract structured real estate requirements from a chat between a visitor and Property Mitra (UrbanNest Properties, Faridabad, Haryana).
+EXTRACT_SYSTEM = """You extract structured real estate requirements from a chat between a visitor and Estate Mitra (Faridabad Estates, Faridabad, Haryana).
 Return ONLY a JSON object, no prose, with keys:
 intent: "buy" | "rent" | "sell" | null
 locations: array of Faridabad locality names the visitor wants (or owns, for sell), Title Case, e.g. ["Sector 15"] or ["Sainik Colony"], or []
@@ -70,17 +70,17 @@ name: string or null; phone: string or null (exactly as visitor typed)
 handoff: true if the visitor asks to talk to a human, agent, advisor or a real person, else false
 temperature: "Hot" | "Warm" | "Cold". Hot = clear intent, budget and location given, shares contact and wants to proceed soon (site visit, ready to move, urgent). Warm = some requirements clear but undecided or no urgency. Cold = vague, just browsing, or refuses details.
 summary: 2-3 short sentences summarising the visitor's requirement and stage for a sales advisor. Only facts stated by the visitor.
-Locations: use Faridabad locality names exactly in this style: "Sector 10 HBC", "Sector 9", "Sector 15", "Sector 21C", "NIT", "Sainik Colony", "Greenfield Colony", "Charmwood Village", "Sector 82". "sec 15"/"sector-15" => "Sector 15"; "HBC"/"Housing Board Colony" => "Sector 10 HBC"; "Sectors 14 to 17" => ["Sector 14","Sector 15","Sector 16","Sector 17"]; "Greater Faridabad" or "new sectors" => ["Sector 75", ..., "Sector 89"] (all 15); "near X" => ["X"]. If the visitor just says "Faridabad" or "anywhere", use [].
+Locations: use Faridabad locality names exactly in this style: "Sector 10", "Sector 9", "Sector 15", "Sector 21C", "NIT", "Sainik Colony", "Greenfield Colony", "Charmwood Village", "Sector 82". "sec 15"/"sector-15" => "Sector 15"; "HBC"/"Housing Board Colony"/"sec 10" => "Sector 10"; "Sectors 14 to 17" => ["Sector 14","Sector 15","Sector 16","Sector 17"]; "Greater Faridabad" or "new sectors" => ["Sector 75", ..., "Sector 89"] (all 15); "near X" => ["X"]. If the visitor just says "Faridabad" or "anywhere", use [].
 Intent: if the visitor gives a monthly amount or says rent/rental/lease => "rent"; if they mention lakh/crore purchase budget or buying => "buy"; if they want to sell/list their property => "sell".
 Only use what the visitor actually said. Never guess."""
 
-REPLY_RULES = """You are Property Mitra, the friendly AI property advisor of UrbanNest Properties, a real estate consultancy in Faridabad, Haryana.
+REPLY_RULES = """You are Estate Mitra, the friendly AI property advisor of Faridabad Estates, a real estate consultancy in Faridabad, Haryana.
 Goal: understand the visitor's requirement, recommend matching listings, and collect their name and phone for a callback.
 Conversation flow (ask at most 1-2 things per message, keep replies under 90 words, warm Indian English, use lakh/crore):
 1. Ask if they want to Buy, Rent or Sell.
 2. Collect preferred location, budget, property type, bedrooms and possession preference (ready to move / under construction). For Sell, collect location, property type, bedrooms and expected price.
 3. When MATCHING_LISTINGS has items, recommend them by title and briefly explain why each matches using its "reasons" (they are shown as cards with links below your message). Offer to refine (budget, area, BHK).
-4. If search was done and there are no matches, say honestly that no current listing matches and offer a callback from an UrbanNest advisor.
+4. If search was done and there are no matches, say honestly that no current listing matches and offer a callback from a Faridabad Estates advisor.
 5. Ask for name and 10-digit mobile number so an advisor can call back. Once LEAD_SAVED is true, thank them and confirm an advisor will contact them soon.
 STRICT RULES:
 - Recommend ONLY listings in MATCHING_LISTINGS. Never mention any other property.
@@ -88,7 +88,7 @@ STRICT RULES:
 - All listings shown are sample listings for demonstration.
 - Do not process payments, legal verification or transactions.
 - If MATCHING_LISTINGS is [] (an empty list), immediately and honestly say no current listing matches, then offer a callback and ask for name and phone (or suggest relaxing budget/location).
-- If HANDOFF_REQUESTED is true: confirm an UrbanNest human advisor will take over and call them; ask for name and phone if missing.
+- If HANDOFF_REQUESTED is true: confirm a Faridabad Estates human advisor will take over and call them; ask for name and phone if missing.
 - Greet only once; never restart with "Namaste" or re-introduce yourself mid-conversation.
 - Never ask again for anything already in COLLECTED, and do not ask about preferences that a recommended listing already answers.
 - Do not output JSON or markdown tables. Plain text with short line breaks only."""
@@ -165,7 +165,7 @@ def whatsapp_message(lead: dict, matches: list) -> str:
     bl = lead.get("budget_label") or ""
     bud = f" within a budget of {bl[0].lower() + bl[1:]}" if bl else ""
     verb = {"buy": "buy", "rent": "rent", "sell": "sell"}.get(intent, "buy")
-    msg = f"Hi {name}, this is UrbanNest Properties. Thank you for your enquiry on PropMitra to {verb} a {want}{loc}{bud}."
+    msg = f"Hi {name}, this is Faridabad Estates. Thank you for your enquiry on Faridabad Estates to {verb} a {want}{loc}{bud}."
     if matches:
         titles = ", ".join(m["title"] for m in matches[:3])
         msg += f" We have shortlisted options for you, including {titles}."
@@ -192,7 +192,7 @@ def build_lead_fields(req: dict, matches: list) -> dict:
 
 
 def transcript_text(messages):
-    return "\n".join(f"{'Visitor' if m['role'] == 'user' else 'Property Mitra'}: {m['content']}" for m in messages)
+    return "\n".join(f"{'Visitor' if m['role'] == 'user' else 'Estate Mitra'}: {m['content']}" for m in messages)
 
 
 class ChatIn(BaseModel):
@@ -201,7 +201,7 @@ class ChatIn(BaseModel):
     message: str = Field(min_length=1, max_length=1500)
 
 
-GREETING = ("Namaste! I'm Property Mitra, your AI property advisor from UrbanNest Properties. "
+GREETING = ("Namaste! I'm Estate Mitra, your AI property advisor from Faridabad Estates — Find Your Place. Build Your Future. "
             "Are you looking to Buy, Rent or Sell a property in Faridabad?")
 
 
@@ -225,7 +225,7 @@ async def chat_stream(body: ChatIn):
     if not text:
         raise HTTPException(status_code=422, detail="Message cannot be empty")
     if not os.environ.get("EMERGENT_LLM_KEY"):
-        raise HTTPException(status_code=503, detail="Property Mitra is not configured yet. Please contact UrbanNest directly.")
+        raise HTTPException(status_code=503, detail="Estate Mitra is not configured yet. Please contact Faridabad Estates directly.")
     sid = body.session_id or f"chat_{uuid.uuid4().hex}"
     s = await db.chat_sessions.find_one({"session_id": sid}, {"_id": 0})
     if not s:
@@ -262,7 +262,7 @@ async def chat_stream(body: ChatIn):
         reply = ""
         try:
             chat = llm(f"reply-{uuid.uuid4().hex}", system)
-            prompt = f"CONVERSATION SO FAR:\n{transcript}\n\nWrite Property Mitra's next reply to the visitor's last message."
+            prompt = f"CONVERSATION SO FAR:\n{transcript}\n\nWrite Estate Mitra's next reply to the visitor's last message."
             async for ev in chat.stream_message(UserMessage(text=prompt)):
                 if isinstance(ev, TextDelta):
                     reply += ev.content
@@ -272,7 +272,7 @@ async def chat_stream(body: ChatIn):
         except Exception as e:
             log.error("reply failed: %s", e)
             if not reply:
-                reply = "Sorry, I'm having trouble right now. Please share your name and phone and an UrbanNest advisor will call you back."
+                reply = "Sorry, I'm having trouble right now. Please share your name and phone and a Faridabad Estates advisor will call you back."
                 yield f"data: {json.dumps({'type': 'delta', 'content': reply})}\n\n"
         all_msgs = messages + [{"role": "assistant", "content": reply, "ts": now_iso(),
                                 "matches": shown}]
@@ -285,11 +285,15 @@ async def chat_stream(body: ChatIn):
                          "handoff_requested": bool(req.get("handoff")), "source_page": s.get("source_page") or body.source_page,
                          "enquiry_type": "Human handoff" if req.get("handoff") else "AI-qualified enquiry"})
             if lead_id:
+                prev = await db.leads.find_one({"id": lead_id}, {"_id": 0, "temperature": 1, "hot_alert_sent": 1}) or {}
                 await db.leads.update_one({"id": lead_id}, {"$set": lead})
+                if lead["temperature"] == "Hot" and not prev.get("hot_alert_sent"):
+                    asyncio.create_task(send_lead_alert({**lead, "id": lead_id}))
             else:
                 lead_id = str(uuid.uuid4())
                 await db.leads.insert_one({**lead, "id": lead_id, "status": "New", "notes": [], "created_at": now_iso()})
-                asyncio.create_task(send_lead_alert(lead))
+                if lead["temperature"] == "Hot":
+                    asyncio.create_task(send_lead_alert({**lead, "id": lead_id}))
             update["lead_id"] = lead_id
         await db.chat_sessions.update_one({"session_id": sid}, {"$set": update})
         yield f"data: {json.dumps({'type': 'done', 'lead_saved': bool(lead_id)})}\n\n"

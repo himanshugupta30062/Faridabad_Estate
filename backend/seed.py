@@ -8,10 +8,10 @@ Q = "?crop=entropy&cs=srgb&fm=jpg&w=1200&q=80"
 
 SAMPLE_NOTE = " SAMPLE listing for illustration only — not verified and not available."
 SAMPLES = [
-    ("Sector 10 HBC 2 BHK Builder Floor", "buy", "Sector 10 HBC", "Builder Floor", 2, 2, 1050, 6200000, "Ready to move",
+    ("Sector 10 2 BHK Builder Floor", "buy", "Sector 10", "Builder Floor", 2, 2, 1050, 6200000, "Ready to move",
      "1688653802629-5360086bf632", "Illustrative 2 BHK builder floor in the Housing Board Colony area of Sector 10, Faridabad."),
-    ("Sector 10 HBC 3 BHK Floor Rental", "rent", "Sector 10 HBC", "Builder Floor", 3, 2, 1350, 22000, "Ready to move",
-     "1738168246881-40f35f8aba0a", "Illustrative 3 BHK builder floor for rent in Sector 10 HBC, Faridabad."),
+    ("Sector 10 3 BHK Floor Rental", "rent", "Sector 10", "Builder Floor", 3, 2, 1350, 22000, "Ready to move",
+     "1738168246881-40f35f8aba0a", "Illustrative 3 BHK builder floor for rent in Sector 10, Faridabad."),
     ("Sector 9 Independent House", "buy", "Sector 9", "Independent House", 4, 4, 2400, 21000000, "Ready to move",
      "1580587771525-78b9dba3b914", "Illustrative 4 BHK independent house in Sector 9, Faridabad."),
     ("Sector 15 3 BHK Builder Floor", "buy", "Sector 15", "Builder Floor", 3, 3, 1600, 13500000, "Ready to move",

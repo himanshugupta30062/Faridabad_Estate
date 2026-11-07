@@ -11,13 +11,13 @@ def img(i):
 
 
 # Demo-only extras for the 8 sample listings: gallery, furnishing and approximate locality coordinates
-# Default search centre: Sector 10 HBC, Faridabad (locality centroid, not an address)
+# Default search centre: Sector 10, Faridabad (locality centroid, not an address)
 SEARCH_CENTER = (28.3775, 77.3045)
 
 # Demo-only extras for sample listings: gallery, furnishing and approximate locality coordinates
 SAMPLE_EXTRAS = {
-    "Sector 10 HBC 2 BHK Builder Floor": (["1688653802629-5360086bf632", "1628592102751-ba83b0314276", "1702295297205-700e205030d0", "1600489000022-c2086d79f9d4"], "Semi-furnished", 28.3775, 77.3045),
-    "Sector 10 HBC 3 BHK Floor Rental": (["1738168246881-40f35f8aba0a", "1642541070065-3912f347e7c6", "1725257928373-dc6d2ac7b145"], "Semi-furnished", 28.3790, 77.3030),
+    "Sector 10 2 BHK Builder Floor": (["1688653802629-5360086bf632", "1628592102751-ba83b0314276", "1702295297205-700e205030d0", "1600489000022-c2086d79f9d4"], "Semi-furnished", 28.3775, 77.3045),
+    "Sector 10 3 BHK Floor Rental": (["1738168246881-40f35f8aba0a", "1642541070065-3912f347e7c6", "1725257928373-dc6d2ac7b145"], "Semi-furnished", 28.3790, 77.3030),
     "Sector 9 Independent House": (["1580587771525-78b9dba3b914", "1738168279272-c08d6dd22002", "1757344454333-cc666252e596", "1502005097973-6a7082348e28"], "Unfurnished", 28.3820, 77.3080),
     "Sector 15 3 BHK Builder Floor": (["1624204386084-dd8c05e32226", "1613575831056-0acd5da8f085", "1720420021124-4e18564e070f", "1610177534644-34d881503b83"], "Semi-furnished", 28.3960, 77.3230),
     "Sector 16 2 BHK Apartment Rental": (["1551361415-69c87624334f", "1758448511320-05d7d28f4298", "1696762932825-2737db830bbe"], "Fully furnished", 28.4070, 77.3180),
@@ -32,10 +32,10 @@ SAMPLE_EXTRAS = {
 }
 
 NEIGHBOURHOODS = [
-    {"slug": "sector-10-hbc", "name": "Sector 10 HBC", "lat": 28.3775, "lng": 77.3045, "localities": ["Sector 10 HBC"],
+    {"slug": "sector-10", "name": "Sector 10", "lat": 28.3775, "lng": 77.3045, "localities": ["Sector 10"],
      "intro": "A settled residential pocket around the Housing Board Colony in central Faridabad, with builder floors and independent homes."},
     {"slug": "sectors-7-11", "name": "Sectors 7–11", "lat": 28.3800, "lng": 77.3050,
-     "localities": ["Sector 7", "Sector 8", "Sector 9", "Sector 10 HBC", "Sector 11"],
+     "localities": ["Sector 7", "Sector 8", "Sector 9", "Sector 10", "Sector 11"],
      "intro": "Established central sectors of Faridabad with a mix of plotted houses and builder floors."},
     {"slug": "sectors-14-17", "name": "Sectors 14–17", "lat": 28.4000, "lng": 77.3210,
      "localities": ["Sector 14", "Sector 15", "Sector 16", "Sector 17"],

@@ -35,8 +35,8 @@ export default function AccountAuth({ mode }) {
   const field = "h-12 bg-white border-[#DDD7CB]";
   return (
     <div className="max-w-md mx-auto px-4 py-16 sm:py-24" data-testid={reg ? "register-page" : "login-page"}>
-      <Seo title={`${reg ? "Create account" : "Sign in"} | PropMitra`} description="Save homes and keep your shortlist across devices." />
-      <p className="eyebrow">Your PropMitra account</p>
+      <Seo title={`${reg ? "Create account" : "Sign in"} | Faridabad Estates`} description="Save homes and keep your shortlist across devices." />
+      <p className="eyebrow">Your Faridabad Estates account</p>
       <h1 className="font-serif text-4xl mt-3">{reg ? "Create your account" : "Welcome back"}</h1>
       <p className="text-[#55524D] mt-2 text-sm">Save homes and pick up your shortlist on any device.</p>
       <form onSubmit={submit} noValidate className="space-y-3 mt-8">
@@ -49,7 +49,7 @@ export default function AccountAuth({ mode }) {
         </button>
       </form>
       <p className="text-sm text-[#55524D] mt-6">
-        {reg ? "Already have an account? " : "New to PropMitra? "}
+        {reg ? "Already have an account? " : "New to Faridabad Estates? "}
         <Link to={`${reg ? "/login" : "/register"}?next=${encodeURIComponent(next)}`} className="text-[#111114] underline" data-testid={reg ? "register-login-link" : "login-register-link"}>{reg ? "Sign in" : "Create an account"}</Link>
       </p>
     </div>

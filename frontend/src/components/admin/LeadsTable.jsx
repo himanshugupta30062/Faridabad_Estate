@@ -22,7 +22,7 @@ export const LeadsTable = ({ leads, onOpen, filter, setFilter, q, setQ }) => (
       <table className="w-full text-sm min-w-[1000px]">
         <thead>
           <tr className="text-left text-[10px] uppercase tracking-[0.15em] text-zinc-500">
-            {["Name", "Phone", "Intent", "Requirement", "Budget", "Location", "Lead", "Status", "Source", "Date"].map((h) => <th key={h} className="px-5 py-3 font-medium">{h}</th>)}
+            {["Name", "Phone", "Intent", "Requirement", "Budget", "Location", "Lead", "Status", "Follow-up", "Source", "Date"].map((h) => <th key={h} className="px-5 py-3 font-medium">{h}</th>)}
           </tr>
         </thead>
         <tbody>
@@ -36,6 +36,7 @@ export const LeadsTable = ({ leads, onOpen, filter, setFilter, q, setQ }) => (
               <td className="px-5 py-3.5 text-zinc-300">{l.location || "—"}</td>
               <td className="px-5 py-3.5"><TempBadge t={l.temperature} /></td>
               <td className="px-5 py-3.5 text-zinc-300 whitespace-nowrap">{l.status || "New"}</td>
+              <td className="px-5 py-3.5 text-zinc-300 whitespace-nowrap">{l.follow_up_date || "—"}</td>
               <td className="px-5 py-3.5 text-zinc-400 whitespace-nowrap">{{ chatbot: "AI chat", website_form: "Form", whatsapp: "WhatsApp" }[l.source] || l.source}</td>
               <td className="px-5 py-3.5 text-zinc-500 whitespace-nowrap">{fmtDate(l.created_at)}</td>
             </tr>

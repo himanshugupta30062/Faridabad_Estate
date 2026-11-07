@@ -27,7 +27,7 @@ export default function ComparePage() {
   }, [ids]);
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-8 lg:px-12 py-12" data-testid="compare-page">
-      <Seo title="Compare properties | PropMitra" description="Compare up to three Faridabad properties side by side." />
+      <Seo title="Compare properties | Faridabad Estates" description="Compare up to three Faridabad properties side by side." />
       <h1 className="font-serif text-4xl">Compare homes</h1>
       {!items.length ? (
         <div className="border border-dashed border-[#D8D2C4] rounded-xl p-10 text-center mt-8" data-testid="compare-empty">

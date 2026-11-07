@@ -4,7 +4,7 @@ import { Sparkles, X, Send, MapPin, BedDouble, Headset } from "lucide-react";
 import { API, formatPrice, imageSrc } from "@/lib/api";
 
 const SID_KEY = "propmitra_chat_sid";
-const GREETING = "Namaste! I'm Property Mitra, your AI property advisor from UrbanNest Properties. Are you looking to Buy, Rent or Sell a property in Faridabad?";
+const GREETING = "Namaste! I'm Estate Mitra, your AI property advisor from Faridabad Estates — Find Your Place. Build Your Future. Are you looking to Buy, Rent or Sell a property in Faridabad?";
 
 const MiniCard = ({ p }) => (
   <Link to={`/property/${p.slug}`} className="flex gap-3 bg-[#0F0F12] border border-[#D4AF37]/30 hover:border-[#D4AF37] rounded-sm p-2 min-w-[260px] max-w-[280px]" data-testid={`chat-match-${p.id}`}>
@@ -115,7 +115,7 @@ export const ChatWidget = () => {
     <>
       {!open && (
         <button onClick={() => setOpen(true)} className="fixed bottom-20 lg:bottom-5 right-4 sm:right-5 z-50 btn-gold rounded-full px-4 sm:pl-4 sm:pr-5 h-12 sm:h-14 flex items-center gap-2 shadow-2xl font-medium" data-testid="chat-open-button">
-          <Sparkles className="w-5 h-5" /> <span className="hidden sm:inline">Ask Property Mitra</span>
+          <Sparkles className="w-5 h-5" /> <span className="hidden sm:inline">Ask Estate Mitra</span>
         </button>
       )}
       {open && (
@@ -124,8 +124,8 @@ export const ChatWidget = () => {
             <div className="flex items-center gap-3">
               <span className="w-9 h-9 rounded-full btn-gold flex items-center justify-center"><Sparkles className="w-4 h-4" /></span>
               <div>
-                <p className="text-white font-serif">Property Mitra</p>
-                <p className="text-[11px] text-zinc-500">AI advisor · UrbanNest Properties</p>
+                <p className="text-white font-serif">Estate Mitra</p>
+                <p className="text-[11px] text-zinc-500">AI advisor · Faridabad Estates</p>
               </div>
             </div>
             <div className="flex items-center gap-1">
@@ -136,12 +136,12 @@ export const ChatWidget = () => {
           </div>
           <div className="flex-1 overflow-y-auto thin-scroll p-4 space-y-4" data-testid="chat-messages">
             {messages.map((m, i) => <Bubble key={i} m={m} />)}
-            {!configured && <p className="text-center text-xs text-red-300 bg-red-500/10 rounded-sm p-3" data-testid="chat-not-configured">Property Mitra isn't configured yet (AI key missing on the server). Please call or WhatsApp UrbanNest directly.</p>}
+            {!configured && <p className="text-center text-xs text-red-300 bg-red-500/10 rounded-sm p-3" data-testid="chat-not-configured">Estate Mitra isn't configured yet (AI key missing on the server). Please call or WhatsApp Faridabad Estates directly.</p>}
             {messages.length === 1 && configured && (
               <div className="flex gap-2 flex-wrap">
                 {[["buy", "Buy", "I want to buy a property"], ["rent", "Rent", "I want to rent a property"], ["sell", "Sell", "I want to sell my property"],
                   ["eg1", "3 BHK in Sector 15 under ₹1.5 Cr", "Find me a 3 BHK in Sector 15 under ₹1.5 crore."],
-                  ["eg2", "Rental near Sector 10 HBC", "I need a rental near Sector 10 HBC under ₹25,000."]].map(([k, t, m]) => (
+                  ["eg2", "Rental near Sector 10", "I need a rental near Sector 10 under ₹25,000."]].map(([k, t, m]) => (
                   <button key={k} onClick={() => send(m)} data-testid={`chat-quick-${k}`}
                     className="px-4 py-1.5 rounded-full border border-[#D4AF37]/50 text-[#F3E5AB] text-sm hover:bg-[#D4AF37]/10">{t}</button>
                 ))}

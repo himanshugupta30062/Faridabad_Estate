@@ -33,7 +33,7 @@ def _in(locs):
 async def search_meta():
     locs = await db.properties.distinct("location", {"is_active": True})
     areas = sorted({*locs, *[n["name"] for n in NEIGHBOURHOODS]})
-    return {"center": {"name": "Sector 10 HBC, Faridabad", "lat": SEARCH_CENTER[0], "lng": SEARCH_CENTER[1]}, "suggestions": areas,
+    return {"center": {"name": "Sector 10, Faridabad", "lat": SEARCH_CENTER[0], "lng": SEARCH_CENTER[1]}, "suggestions": areas,
             "groups": [{"name": n["name"], "localities": n["localities"]} for n in NEIGHBOURHOODS]}
 
 

@@ -130,7 +130,8 @@ async def create_enquiry(body: EnquiryIn):
                  "transcript": [{"role": "user", "content": text, "ts": now_iso()}],
                  "created_at": now_iso(), "updated_at": now_iso()})
     await db.leads.insert_one(dict(lead))
-    asyncio.create_task(send_lead_alert(lead))
+    if lead.get("temperature") == "Hot":
+        asyncio.create_task(send_lead_alert(lead))
     return {"ok": True, "id": lead["id"]}
 
 
@@ -153,7 +154,7 @@ def bucket(lead):
     return "Above ₹3 Cr"
 
 
-SOURCE_LABELS = {"chatbot": "Property Mitra AI", "website_form": "Website forms", "whatsapp": "WhatsApp"}
+SOURCE_LABELS = {"chatbot": "Estate Mitra AI", "website_form": "Website forms", "whatsapp": "WhatsApp"}
 
 
 async def property_performance(leads):
@@ -192,6 +193,9 @@ async def stats():
         "status": dict(Counter(l.get("status") or "New" for l in leads)),
         "recent": [{k: l.get(k) for k in ["id", "name", "intent", "location", "temperature", "created_at", "source"]} for l in leads[:5]],
         "property_performance": await property_performance(leads),
+        "follow_ups": sorted([{k: l.get(k) for k in ["id", "name", "phone", "follow_up_date", "status", "temperature"]}
+                              for l in leads if l.get("follow_up_date") and l.get("status") not in ("Closed", "Lost")],
+                             key=lambda x: x["follow_up_date"])[:8],
     }
 
 
@@ -221,6 +225,7 @@ async def get_lead(lid: str):
 class LeadPatch(BaseModel):
     temperature: Optional[Literal["Hot", "Warm", "Cold"]] = None
     status: Optional[Literal["New", "Contacted", "Follow-up", "Visit scheduled", "Negotiation", "Closed", "Lost"]] = None
+    follow_up_date: Optional[str] = Field(default=None, pattern=r"^(\d{4}-\d{2}-\d{2})?$")
 
 
 class NoteIn(BaseModel):

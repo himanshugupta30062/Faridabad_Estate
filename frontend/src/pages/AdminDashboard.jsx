@@ -49,7 +49,7 @@ export default function AdminDashboard() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <span className="w-9 h-9 rounded-sm border border-[#D4AF37]/60 flex items-center justify-center font-serif text-[#D4AF37]">U</span>
-            <div><p className="font-serif">PropMitra Admin</p><p className="text-[11px] text-zinc-500">{user?.email}</p></div>
+            <div><p className="font-serif">Faridabad Estates Admin</p><p className="text-[11px] text-zinc-500">{user?.email}</p></div>
           </div>
           <div className="flex items-center gap-2">
             <Link to="/" className="text-sm text-zinc-400 hover:text-white flex items-center gap-1 px-2" data-testid="admin-view-site"><ExternalLink className="w-4 h-4" /><span className="hidden sm:inline">Website</span></Link>

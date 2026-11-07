@@ -52,7 +52,7 @@ export const EnquiryForm = ({ property, types = ["callback"], defaultIntent = "b
       <div className={`py-8 text-center ${ink}`} data-testid="enquiry-success">
         <CheckCircle2 className="w-10 h-10 mx-auto text-[#c9a54c]" />
         <p className="font-serif text-2xl mt-3">Thank you, {f.name.split(" ")[0]}.</p>
-        <p className={`text-sm mt-2 ${dark ? "text-white/70" : "text-[#55524D]"}`}>An UrbanNest advisor will contact you on {f.phone} shortly.</p>
+        <p className={`text-sm mt-2 ${dark ? "text-white/70" : "text-[#55524D]"}`}>An Faridabad Estates advisor will contact you on {f.phone} shortly.</p>
       </div>
     );
   return (

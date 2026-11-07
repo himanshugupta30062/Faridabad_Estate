@@ -1,12 +1,26 @@
 import { Link, Outlet, useLocation } from "react-router-dom";
 import { useEffect } from "react";
-import { X } from "lucide-react";
+import { X, MessageCircle } from "lucide-react";
+import { toast } from "sonner";
 import { SiteHeader, Logo } from "./SiteHeader";
 import { ChatWidget } from "./ChatWidget";
-import { COMPANY } from "@/config/company";
+import { COMPANY, whatsappUrl } from "@/config/company";
+
+export const openWhatsApp = (text) => {
+  const url = whatsappUrl(text);
+  if (!url) return toast.error("WhatsApp number not configured yet", { description: "Please call or use the enquiry form — the business will add its WhatsApp number soon." });
+  window.open(url, "_blank", "noopener");
+};
+
+const WhatsAppFab = () => (
+  <button onClick={() => openWhatsApp(`Hi ${COMPANY.name}, I'm looking for a property in Faridabad. Please help me.`)} aria-label="Chat on WhatsApp"
+    className="fixed bottom-36 lg:bottom-24 right-4 sm:right-5 z-50 w-12 h-12 rounded-full bg-[#1f7a4d] text-white flex items-center justify-center shadow-xl hover:bg-[#186640] transition-colors" data-testid="whatsapp-fab">
+    <MessageCircle className="w-5 h-5" />
+  </button>
+);
 import { useLocalList, KEYS, clearCompare } from "@/lib/local";
 
-const NEIGH = [["sector-10-hbc", "Sector 10 HBC"], ["sectors-14-17", "Sectors 14–17"], ["sectors-21c-21d", "Sectors 21C & 21D"], ["sainik-colony", "Sainik Colony"], ["charmwood-village", "Charmwood Village"], ["greater-faridabad", "Greater Faridabad"]];
+const NEIGH = [["sector-10", "Sector 10"], ["sectors-14-17", "Sectors 14–17"], ["sectors-21c-21d", "Sectors 21C & 21D"], ["sainik-colony", "Sainik Colony"], ["charmwood-village", "Charmwood Village"], ["greater-faridabad", "Greater Faridabad"]];
 
 const SiteFooter = () => (
   <footer className="bg-[#111114] text-white/70" data-testid="site-footer">
@@ -21,7 +35,7 @@ const SiteFooter = () => (
         <ul className="mt-4 space-y-2 text-sm">
           <li><Link to="/properties?listing_type=buy" className="hover:text-white">Homes for sale</Link></li>
           <li><Link to="/properties?listing_type=rent" className="hover:text-white">Homes for rent</Link></li>
-          <li><Link to="/#sell" className="hover:text-white">Sell with UrbanNest</Link></li>
+          <li><Link to="/#sell" className="hover:text-white">Sell with Faridabad Estates</Link></li>
           <li><Link to="/compare" className="hover:text-white">Compare</Link></li>
           <li><Link to="/saved" className="hover:text-white">Saved homes</Link></li>
         </ul>
@@ -75,6 +89,7 @@ export default function SiteLayout() {
       <main id="main" className="flex-1"><Outlet /></main>
       <SiteFooter />
       <CompareTray />
+      <WhatsAppFab />
       <ChatWidget />
     </div>
   );

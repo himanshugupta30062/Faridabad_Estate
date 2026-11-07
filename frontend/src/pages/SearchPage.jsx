@@ -75,7 +75,7 @@ export default function SearchPage() {
 
   return (
     <div data-testid="search-page">
-      <Seo title={`${title} | PropMitra`} description={`Browse ${items.length} ${lt === "rent" ? "rental" : "sale"} listings across Faridabad with filters for price, BHK, area and possession.`} />
+      <Seo title={`${title} | Faridabad Estates`} description={`Browse ${items.length} ${lt === "rent" ? "rental" : "sale"} listings across Faridabad with filters for price, BHK, area and possession.`} />
       <div className="sticky top-16 z-30 bg-[#FAF9F6]/95 backdrop-blur border-b border-[#E5E1D8]">
         <div className="max-w-7xl mx-auto px-4 sm:px-8 lg:px-12 py-3 flex flex-wrap items-center gap-2">
           <div className="flex bg-[#F0ECE3] rounded-full p-1" role="tablist">
@@ -111,10 +111,10 @@ export default function SearchPage() {
         {!loading && !error && !items.length && (
           <div className="border border-dashed border-[#D8D2C4] rounded-xl p-10 text-center" data-testid="search-empty">
             <p className="font-serif text-2xl">No homes match these filters yet.</p>
-            <p className="text-[#55524D] text-sm mt-2">Try widening your budget or area — or tell Property Mitra exactly what you need and an advisor will call you.</p>
+            <p className="text-[#55524D] text-sm mt-2">Try widening your budget or area — or tell Estate Mitra exactly what you need and an advisor will call you.</p>
             <div className="flex flex-wrap gap-3 justify-center mt-6">
               <button onClick={clear} className="btn-line rounded-full h-11 px-5 text-sm">Clear filters</button>
-              <button onClick={() => openChat()} className="btn-dark rounded-full h-11 px-5 text-sm flex items-center gap-2"><Sparkles className="w-4 h-4" />Ask Property Mitra</button>
+              <button onClick={() => openChat()} className="btn-dark rounded-full h-11 px-5 text-sm flex items-center gap-2"><Sparkles className="w-4 h-4" />Ask Estate Mitra</button>
             </div>
           </div>
         )}

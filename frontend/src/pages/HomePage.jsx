@@ -6,6 +6,32 @@ import { ListingCard } from "@/components/site/ListingCard";
 import { EnquiryForm } from "@/components/site/EnquiryForm";
 import { Seo } from "@/components/site/Seo";
 import { COMPANY, TEAM, TESTIMONIALS } from "@/config/company";
+import { openWhatsApp } from "@/components/site/SiteLayout";
+
+const EXPLORE_LOCALITIES = ["Sector 10", "Sector 15", "Sector 16", "Sector 21C", "Sainik Colony", "Greenfield Colony", "Charmwood Village", "NIT", "Greater Faridabad (Sectors 75–89)"];
+const EXPLORE_TYPES = ["Apartment", "Builder Floor", "Independent House", "Villa", "Plot"];
+const EXPLORE_BUDGETS = [["buy", "max_price=7500000", "Buy under ₹75 lakh"], ["buy", "min_price=7500000&max_price=15000000", "Buy ₹75 lakh – ₹1.5 Cr"], ["buy", "min_price=15000000", "Buy above ₹1.5 Cr"],
+  ["rent", "max_price=20000", "Rent under ₹20,000"], ["rent", "min_price=20000", "Rent above ₹20,000"]];
+
+const Pill = ({ to, children, id }) => (
+  <Link to={to} className="btn-line rounded-full px-4 h-9 text-sm inline-flex items-center bg-white hover:bg-[#F4F1EA]" data-testid={`explore-${id}`}>{children}</Link>
+);
+
+const ExploreLinks = () => (
+  <section className="max-w-7xl mx-auto px-4 sm:px-8 lg:px-12 pb-4" data-testid="explore-section">
+    <p className="eyebrow">Explore properties</p>
+    <div className="grid lg:grid-cols-[150px_1fr] gap-x-6 gap-y-3 mt-5 text-sm">
+      <p className="text-[#8a8579] pt-2">Buy or rent</p>
+      <div className="flex flex-wrap gap-2"><Pill to="/properties?listing_type=buy" id="buy">Homes for sale</Pill><Pill to="/properties?listing_type=rent" id="rent">Homes for rent</Pill></div>
+      <p className="text-[#8a8579] pt-2">Localities</p>
+      <div className="flex flex-wrap gap-2">{EXPLORE_LOCALITIES.map((l) => <Pill key={l} to={`/properties?q=${encodeURIComponent(l)}`} id={`loc-${l.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`}>{l.replace(" (Sectors 75–89)", "")}</Pill>)}</div>
+      <p className="text-[#8a8579] pt-2">Property type</p>
+      <div className="flex flex-wrap gap-2">{EXPLORE_TYPES.map((t) => <Pill key={t} to={`/properties?property_type=${encodeURIComponent(t)}`} id={`type-${t.toLowerCase().replace(/\s/g, "-")}`}>{t}</Pill>)}</div>
+      <p className="text-[#8a8579] pt-2">Budget</p>
+      <div className="flex flex-wrap gap-2">{EXPLORE_BUDGETS.map(([lt, q, l], i) => <Pill key={l} to={`/properties?listing_type=${lt}&${q}`} id={`budget-${i}`}>{l}</Pill>)}</div>
+    </div>
+  </section>
+);
 
 const HERO = "https://images.unsplash.com/photo-1706808849780-7a04fbac83ef?crop=entropy&cs=srgb&fm=jpg&w=2200&q=75";
 const BUDGETS = { buy: [["", "Any budget"], ["10000000", "Under ₹1 Cr"], ["15000000", "Under ₹1.5 Cr"], ["20000000", "Under ₹2 Cr"], ["35000000", "Under ₹3.5 Cr"]],
@@ -39,7 +65,7 @@ const HeroSearch = () => {
       </div>
       {mode === "sell" ? (
         <div className="flex flex-col sm:flex-row gap-3 sm:items-center justify-between p-2">
-          <p className="text-sm text-[#2b2a27]">Thinking of selling? Share your property details and an UrbanNest advisor will call you.</p>
+          <p className="text-sm text-[#2b2a27]">Thinking of selling? Share your property details and a Faridabad Estates advisor will call you.</p>
           <button className="btn-gold rounded-md h-12 px-6 font-medium shrink-0" data-testid="hero-sell-button">Start selling</button>
         </div>
       ) : (
@@ -89,17 +115,17 @@ export default function HomePage() {
 
   return (
     <>
-      <Seo title="PropMitra by UrbanNest Properties — Find a Home in Faridabad" description="Discover apartments, villas and rentals across Faridabad with PropMitra, the AI real estate advisor from UrbanNest Properties." />
+      <Seo title="Faridabad Estates — Find Your Place. Build Your Future. | Faridabad, Haryana" description="Discover apartments, villas and rentals across Faridabad with PropMitra, the AI real estate advisor from Faridabad Estates." />
       <section className="relative min-h-[88vh] flex items-end" data-testid="hero-section">
         <img src={HERO} alt="Contemporary home with a pool at dusk" className="absolute inset-0 w-full h-full object-cover" fetchpriority="high" />
         <div className="absolute inset-0 bg-gradient-to-t from-[#111114]/90 via-[#111114]/40 to-[#111114]/10" />
         <div className="relative w-full max-w-7xl mx-auto px-4 sm:px-8 lg:px-12 pb-12 sm:pb-16 pt-32">
-          <p className="eyebrow !text-[#e3c77a] fade-up">{COMPANY.name} · {COMPANY.city}</p>
+          <p className="eyebrow !text-[#e3c77a] fade-up">{COMPANY.name} · {COMPANY.tagline}</p>
           <h1 className="font-serif text-white text-4xl sm:text-5xl lg:text-6xl font-medium leading-[1.08] mt-4 max-w-3xl fade-up" style={{ animationDelay: "80ms" }}>Find a Place You'll Love to Call Home.</h1>
           <p className="text-white/80 text-base sm:text-lg mt-5 max-w-xl fade-up" style={{ animationDelay: "160ms" }}>Discover exceptional properties across Faridabad with your personal AI real estate advisor.</p>
           <div className="flex flex-wrap gap-3 mt-8 fade-up" style={{ animationDelay: "220ms" }}>
             <Link to="/properties" className="btn-gold rounded-full h-12 px-6 font-medium flex items-center gap-2" data-testid="hero-explore-button">Explore Properties <ArrowRight className="w-4 h-4" /></Link>
-            <button onClick={() => openChat()} className="rounded-full h-12 px-6 font-medium flex items-center gap-2 bg-white/10 text-white border border-white/30 hover:bg-white/20 transition-colors" data-testid="hero-chat-button"><Sparkles className="w-4 h-4 text-[#e3c77a]" />Talk to Property Mitra</button>
+            <button onClick={() => openChat()} className="rounded-full h-12 px-6 font-medium flex items-center gap-2 bg-white/10 text-white border border-white/30 hover:bg-white/20 transition-colors" data-testid="hero-chat-button"><Sparkles className="w-4 h-4 text-[#e3c77a]" />Talk to Estate Mitra</button>
           </div>
           <div className="mt-10 fade-up" style={{ animationDelay: "300ms" }}><HeroSearch /></div>
         </div>
@@ -117,6 +143,8 @@ export default function HomePage() {
           </Link>
         ))}
       </section>
+
+      <ExploreLinks />
 
       <section className="max-w-7xl mx-auto px-4 sm:px-8 lg:px-12 py-12 sm:py-16" data-testid="featured-section">
         <Head eyebrow="Handpicked" title="Featured homes across Faridabad" action={<Link to="/properties" className="btn-line rounded-full px-5 h-10 text-sm flex items-center gap-2 self-start" data-testid="featured-view-all">View all properties <ArrowRight className="w-4 h-4" /></Link>} />
@@ -158,13 +186,13 @@ export default function HomePage() {
           <div>
             <p className="eyebrow !text-[#e3c77a]">How our advisory works</p>
             <h2 className="font-serif text-3xl sm:text-4xl mt-3">An AI advisor that listens, and a human who follows through.</h2>
-            <p className="text-white/65 mt-5 max-w-md">Property Mitra only recommends homes that exist in our live listings. Your UrbanNest advisor takes it from there.</p>
-            <button onClick={() => openChat()} className="btn-gold rounded-full h-12 px-6 font-medium mt-8 inline-flex items-center gap-2" data-testid="advisory-chat-button"><Sparkles className="w-4 h-4" />Talk to Property Mitra</button>
+            <p className="text-white/65 mt-5 max-w-md">Estate Mitra only recommends homes that exist in our live listings. Your Faridabad Estates advisor takes it from there.</p>
+            <button onClick={() => openChat()} className="btn-gold rounded-full h-12 px-6 font-medium mt-8 inline-flex items-center gap-2" data-testid="advisory-chat-button"><Sparkles className="w-4 h-4" />Talk to Estate Mitra</button>
           </div>
           <ol className="grid sm:grid-cols-3 gap-6">
             {[[MessageSquareText, "Tell us what you need", "Share budget, locality and configuration in plain words, in any order."],
               [ListChecks, "See genuine matches", "Get listings from our database, with a clear reason why each one fits."],
-              [PhoneCall, "Meet your advisor", "An UrbanNest advisor calls you to arrange visits and answer details."]].map(([Icon, t, d], i) => (
+              [PhoneCall, "Meet your advisor", "An Faridabad Estates advisor calls you to arrange visits and answer details."]].map(([Icon, t, d], i) => (
               <li key={t} className="border-t border-white/15 pt-6">
                 <span className="font-serif text-[#e3c77a] text-sm">0{i + 1}</span>
                 <Icon className="w-6 h-6 mt-4 text-white/80" /><p className="font-medium mt-4">{t}</p><p className="text-sm text-white/60 mt-2 leading-relaxed">{d}</p>
@@ -193,7 +221,7 @@ export default function HomePage() {
               </figure>
             ))}
           </div>
-          <p className="text-xs text-[#8a8579] mt-4">Team profiles are placeholders — replace with genuine UrbanNest advisors.</p>
+          <p className="text-xs text-[#8a8579] mt-4">Team profiles are placeholders — replace with genuine Faridabad Estates advisors.</p>
         </div>
       </section>
 
@@ -212,7 +240,7 @@ export default function HomePage() {
                 </tr>))}</tbody>
             </table>
           </div>
-          <p className="text-xs text-[#8a8579] mt-3">Calculated live from active UrbanNest SAMPLE listings with illustrative prices. Not an official market index or actual inventory.</p>
+          <p className="text-xs text-[#8a8579] mt-3">Calculated live from active Faridabad Estates SAMPLE listings with illustrative prices. Not an official market index or actual inventory.</p>
         </div>
       </section>
 
@@ -233,9 +261,9 @@ export default function HomePage() {
           <div className="text-white">
             <p className="eyebrow !text-[#e3c77a]">Speak with an advisor</p>
             <h2 className="font-serif text-3xl sm:text-5xl mt-3 leading-tight">Buying, renting or selling? Let's talk.</h2>
-            <p className="text-white/65 mt-5 max-w-md">Share a few details and an UrbanNest advisor will call you back — usually within one working day.</p>
+            <p className="text-white/65 mt-5 max-w-md">Share a few details and a Faridabad Estates advisor will call you back — usually within one working day.</p>
             <div className="mt-8 space-y-2 text-sm text-white/80">
-              <p><a href={`tel:${COMPANY.phoneHref}`} className="hover:text-white">{COMPANY.phoneDisplay}</a> · <a href={`https://wa.me/${COMPANY.whatsapp}`} target="_blank" rel="noreferrer" className="hover:text-white" data-testid="cta-whatsapp-link">WhatsApp</a></p>
+              <p><a href={`tel:${COMPANY.phoneHref}`} className="hover:text-white">{COMPANY.phoneDisplay}</a> · <button onClick={() => openWhatsApp(`Hi ${COMPANY.name}, I'd like to speak with an advisor.`)} className="hover:text-white underline" data-testid="cta-whatsapp-link">WhatsApp</button></p>
               <p>{COMPANY.hours}</p>
             </div>
           </div>

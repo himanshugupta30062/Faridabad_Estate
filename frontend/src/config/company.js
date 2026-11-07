@@ -2,18 +2,20 @@
 const U = "https://images.unsplash.com/photo-";
 
 export const COMPANY = {
-  name: "UrbanNest Properties",
-  product: "PropMitra",
+  name: "Faridabad Estates",
+  product: "Estate Mitra",
+  tagline: "Find Your Place. Build Your Future.",
   city: "Faridabad",
   phoneDisplay: "+91 90000 00000",
   phoneHref: "+919000000000",
-  whatsapp: "919000000000",
+  // Set REACT_APP_WHATSAPP_NUMBER (country code + number, digits only, e.g. 919812345678) in frontend/.env
+  whatsapp: (process.env.REACT_APP_WHATSAPP_NUMBER || "").replace(/\D/g, ""),
   email: "hello@urbannest.in",
   address: "Faridabad, Haryana",
   hours: "Mon – Sat, 10:00 AM – 7:00 PM",
   rera: "[RERA agent registration no. — to be added]",
   registration: "[Company registration no. — to be added]",
-  placeholderNote: "Contact details, registration numbers, team profiles and testimonials are placeholders until UrbanNest provides genuine information.",
+  placeholderNote: "Contact details, registration numbers, team profiles and testimonials are placeholders until Faridabad Estates provides genuine information.",
 };
 
 export const TEAM = [
@@ -28,4 +30,7 @@ export const TESTIMONIALS = [
   { name: "Demo client", role: "House buyer · Sector 21C", text: "Clear information, no pressure and genuinely helpful follow-up." },
 ];
 
-export const AGENT = { name: "UrbanNest advisory desk", role: "Your UrbanNest property advisor", img: TEAM[0].img };
+export const whatsappUrl = (text) =>
+  COMPANY.whatsapp ? `https://wa.me/${COMPANY.whatsapp}?text=${encodeURIComponent(text)}` : null;
+
+export const AGENT = { name: "Faridabad Estates advisory desk", role: "Your Faridabad Estates property advisor", img: TEAM[0].img };

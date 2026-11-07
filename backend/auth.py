@@ -176,7 +176,7 @@ async def google_session(body: SessionIn, response: Response):
     data = r.json()
     email = data["email"].lower()
     if email not in admin_allowlist():
-        raise HTTPException(status_code=403, detail=f"{email} is not authorised as an UrbanNest admin.")
+        raise HTTPException(status_code=403, detail=f"{email} is not authorised as a Faridabad Estates admin.")
     user = await db.users.find_one({"email": email}, {"_id": 0})
     if not user:
         user = {"user_id": f"user_{uuid.uuid4().hex[:12]}", "email": email, "name": data.get("name", ""),
@@ -210,6 +210,6 @@ async def logout(request: Request, response: Response):
 async def seed_admin():
     email = os.environ["ADMIN_EMAIL"].lower()
     if not await db.users.find_one({"email": email}):
-        await db.users.insert_one({"user_id": f"user_{uuid.uuid4().hex[:12]}", "email": email, "name": "UrbanNest Admin",
+        await db.users.insert_one({"user_id": f"user_{uuid.uuid4().hex[:12]}", "email": email, "name": "Faridabad Estates Admin",
                                    "password_hash": hash_password(os.environ["ADMIN_PASSWORD"]), "role": "admin",
                                    "created_at": datetime.now(timezone.utc)})

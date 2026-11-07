@@ -16,11 +16,11 @@ const NAV = [
 ];
 
 export const Logo = ({ light = false }) => (
-  <Link to="/" className="flex items-center gap-2.5" data-testid="site-logo" aria-label="PropMitra by UrbanNest Properties — home">
-    <span className={`w-9 h-9 rounded-sm flex items-center justify-center font-serif text-lg ${light ? "bg-[#FAF9F6] text-[#111114]" : "bg-[#16161a] text-[#e3c77a]"}`}>P</span>
+  <Link to="/" className="flex items-center gap-2.5" data-testid="site-logo" aria-label="Faridabad Estates — home">
+    <span className={`w-9 h-9 rounded-sm flex items-center justify-center font-serif text-lg ${light ? "bg-[#FAF9F6] text-[#111114]" : "bg-[#16161a] text-[#e3c77a]"}`}>F</span>
     <span className="leading-tight">
-      <span className={`block font-serif text-lg ${light ? "text-white" : "text-[#111114]"}`}>PropMitra</span>
-      <span className={`block text-[9px] uppercase tracking-[0.25em] ${light ? "text-white/60" : "text-[#8a8579]"}`}>by {COMPANY.name}</span>
+      <span className={`block font-serif text-lg ${light ? "text-white" : "text-[#111114]"}`}>{COMPANY.name}</span>
+      <span className={`block text-[9px] uppercase tracking-[0.2em] ${light ? "text-white/60" : "text-[#8a8579]"}`}>{COMPANY.tagline}</span>
     </span>
   </Link>
 );
@@ -48,7 +48,7 @@ export const SiteHeader = () => {
           ) : (
             <Link to="/login" className="hidden sm:flex items-center gap-1.5 text-sm px-3 h-10 rounded-full hover:bg-[#F0ECE3]" data-testid="nav-login"><User className="w-4 h-4" />Sign in</Link>
           )}
-          <button onClick={() => openChat()} className="hidden md:flex btn-dark rounded-full px-4 h-10 text-sm items-center gap-2" data-testid="nav-ask-ai-button"><Sparkles className="w-4 h-4 text-[#e3c77a]" />Ask Property Mitra</button>
+          <button onClick={() => openChat()} className="hidden md:flex btn-dark rounded-full px-4 h-10 text-sm items-center gap-2" data-testid="nav-ask-ai-button"><Sparkles className="w-4 h-4 text-[#e3c77a]" />Ask Estate Mitra</button>
           <button className="lg:hidden w-10 h-10 flex items-center justify-center" onClick={() => setOpen(true)} aria-label="Open menu" data-testid="nav-mobile-toggle"><Menu /></button>
         </div>
       </div>
@@ -61,7 +61,7 @@ export const SiteHeader = () => {
             ))}
             {user ? <button onClick={() => { logout(); setOpen(false); }} className="py-3 text-left">Sign out</button>
               : <Link to="/login" onClick={() => setOpen(false)} className="py-3">Sign in / Create account</Link>}
-            <button onClick={() => { setOpen(false); openChat(); }} className="btn-dark rounded-full h-11 mt-4 flex items-center justify-center gap-2"><Sparkles className="w-4 h-4" />Ask Property Mitra</button>
+            <button onClick={() => { setOpen(false); openChat(); }} className="btn-dark rounded-full h-11 mt-4 flex items-center justify-center gap-2"><Sparkles className="w-4 h-4" />Ask Estate Mitra</button>
           </nav>
         </SheetContent>
       </Sheet>

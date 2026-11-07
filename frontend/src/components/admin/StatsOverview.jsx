@@ -85,7 +85,7 @@ export const StatsOverview = ({ stats }) => {
           </ResponsiveContainer></div>
         ) : <p className="text-zinc-500 text-sm">No data yet</p>}
       </Panel>
-      <div className="grid lg:grid-cols-3 gap-4 sm:gap-6">
+      <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
         <Panel title="Lead sources" testid="panel-sources">
           <Split data={Object.fromEntries(stats.sources.map((s) => [s.source, s.count]))} colors={Object.fromEntries(stats.sources.map((s, i) => [s.source, ["#D4AF37", "#F3E5AB", "#8A7322", "#A1A1AA"][i % 4]]))} />
         </Panel>
@@ -93,6 +93,12 @@ export const StatsOverview = ({ stats }) => {
           <ul className="space-y-3 text-sm">{stats.recent.map((r) => (
             <li key={r.id} className="flex justify-between gap-2"><span className="text-white truncate">{r.name} <span className="text-zinc-500 capitalize">· {r.intent} · {r.location || "—"}</span></span><span className="text-xs text-zinc-400 shrink-0">{r.temperature}</span></li>
           ))}{!stats.recent.length && <li className="text-zinc-500">No enquiries yet</li>}</ul>
+        </Panel>
+        <Panel title="Upcoming follow-ups" testid="panel-followups">
+          <ul className="space-y-3 text-sm">{(stats.follow_ups || []).map((f) => (
+            <li key={f.id} className="flex justify-between gap-2"><span className="text-white truncate">{f.name} <span className="text-zinc-500">· {f.status || "New"}</span></span>
+              <span className={`text-xs shrink-0 ${f.follow_up_date <= new Date().toISOString().slice(0, 10) ? "text-red-400" : "text-zinc-400"}`}>{f.follow_up_date}</span></li>
+          ))}{!(stats.follow_ups || []).length && <li className="text-zinc-500">No follow-ups scheduled</li>}</ul>
         </Panel>
         <Panel title="Lead status" testid="panel-status">
           <Split data={stats.status} colors={new Proxy({}, { get: () => "#D4AF37" })} />

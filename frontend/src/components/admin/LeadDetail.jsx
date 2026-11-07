@@ -16,7 +16,7 @@ const Section = ({ title, children }) => (
   <div className="mt-6"><p className="text-[10px] uppercase tracking-[0.2em] text-[#D4AF37] mb-3">{title}</p>{children}</div>
 );
 
-const SOURCES = { chatbot: "Property Mitra AI", website_form: "Website form", whatsapp: "WhatsApp" };
+const SOURCES = { chatbot: "Estate Mitra AI", website_form: "Website form", whatsapp: "WhatsApp" };
 const STATUSES = ["New", "Contacted", "Follow-up", "Visit scheduled", "Negotiation", "Closed", "Lost"];
 
 const Notes = ({ lead, setLead }) => {
@@ -102,6 +102,15 @@ export const LeadDetail = ({ id, onClose, onChanged }) => {
               </Select>
             </div>
 
+            <div className="mt-3">
+              <label className="text-xs text-zinc-400" htmlFor="followup">Follow-up date</label>
+              <div className="flex gap-2 mt-1">
+                <input id="followup" type="date" value={lead.follow_up_date || ""} onChange={(e) => patch({ follow_up_date: e.target.value })}
+                  className="flex-1 h-10 rounded-md bg-white/5 border border-white/10 text-white px-3 [color-scheme:dark]" data-testid="lead-followup-date" />
+                {lead.follow_up_date && <button onClick={() => patch({ follow_up_date: "" })} className="text-xs text-zinc-400 px-2" data-testid="lead-followup-clear">Clear</button>}
+              </div>
+            </div>
+
             <Section title="AI summary">
               <p className="text-sm text-zinc-300 leading-relaxed bg-[#1A1A22] border border-white/10 rounded-sm p-4" data-testid="lead-detail-summary">{lead.summary || "—"}</p>
             </Section>
@@ -123,7 +132,7 @@ export const LeadDetail = ({ id, onClose, onChanged }) => {
             </Section>
 
             <Section title="WhatsApp follow-up">
-              <textarea readOnly value={lead.whatsapp_message} className="w-full text-sm text-zinc-200 bg-[#1A1A22] border border-white/10 rounded-sm p-4 min-h-[120px]" data-testid="lead-whatsapp-text" />
+              <textarea value={lead.whatsapp_message || ""} onChange={(e) => setLead((l) => ({ ...l, whatsapp_message: e.target.value }))} aria-label="Editable WhatsApp message" className="w-full text-sm text-zinc-200 bg-[#1A1A22] border border-white/10 rounded-sm p-4 min-h-[120px]" data-testid="lead-whatsapp-text" />
               <div className="flex gap-2 mt-2">
                 <button onClick={copy} className="btn-gold rounded-full px-4 py-2 text-sm flex items-center gap-2" data-testid="lead-whatsapp-copy"><Copy className="w-4 h-4" /> Copy message</button>
                 <a href={`https://wa.me/91${lead.phone}?text=${encodeURIComponent(lead.whatsapp_message)}`} target="_blank" rel="noreferrer"
@@ -137,7 +146,7 @@ export const LeadDetail = ({ id, onClose, onChanged }) => {
               <div className="space-y-2" data-testid="lead-transcript">
                 {(lead.transcript || []).map((m, i) => (
                   <div key={i} className={`text-sm rounded-sm px-3 py-2 ${m.role === "user" ? "bg-[#D4AF37]/10 text-[#F3E5AB] ml-8" : "bg-[#1A1A22] text-zinc-300 mr-8"}`}>
-                    <p className="text-[10px] uppercase tracking-widest opacity-60 mb-0.5">{m.role === "user" ? "Visitor" : "Property Mitra"}</p>
+                    <p className="text-[10px] uppercase tracking-widest opacity-60 mb-0.5">{m.role === "user" ? "Visitor" : "Estate Mitra"}</p>
                     <p className="whitespace-pre-wrap">{m.content}</p>
                   </div>
                 ))}
