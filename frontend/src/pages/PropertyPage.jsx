@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { BedDouble, Bath, Maximize, MapPin, CalendarClock, Sofa, Images, ChevronLeft, ChevronRight, X, MessageCircle, Sparkles, Phone, Info } from "lucide-react";
+import { BedDouble, Bath, Maximize, MapPin, CalendarClock, Sofa, Images, ChevronLeft, ChevronRight, X, Sparkles, Phone, Info } from "lucide-react";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { api, formatApiError, formatPrice, imageSrc, openChat, configLabel } from "@/lib/api";
 import { pushRecent } from "@/lib/local";
 import { COMPANY, AGENT } from "@/config/company";
-import { openWhatsApp } from "@/components/site/SiteLayout";
+import { openWhatsApp, WhatsAppIcon } from "@/components/site/SiteLayout";
 import { FavButton, CompareButton, ShareButton } from "@/components/site/PropertyActions";
 import { ListingCard, DemoBadge } from "@/components/site/ListingCard";
 import { PropertyMap } from "@/components/site/PropertyMap";
@@ -136,7 +136,7 @@ export default function PropertyPage() {
               <div><p className="font-medium">{AGENT.name}</p><p className="text-xs text-[#55524D]">{AGENT.role}</p></div>
             </div>
             <div className="grid grid-cols-2 gap-2 mt-5">
-              <a href="#whatsapp" onClick={wa} className="h-11 rounded-md bg-[#1f7a4d] text-white text-sm flex items-center justify-center gap-2 hover:bg-[#186640]" data-testid="property-whatsapp"><MessageCircle className="w-4 h-4" />WhatsApp</a>
+              <a href="#whatsapp" onClick={wa} className="h-11 rounded-md bg-[#25D366] text-white text-sm font-medium flex items-center justify-center gap-2 hover:bg-[#1ebe5b] transition-colors" data-testid="property-whatsapp"><WhatsAppIcon className="w-5 h-5" />WhatsApp</a>
               <a href={`tel:${COMPANY.phoneHref}`} className="btn-line h-11 rounded-md text-sm flex items-center justify-center gap-2" data-testid="property-call"><Phone className="w-4 h-4" />Call</a>
             </div>
             <div className="mt-6"><EnquiryForm property={p} compact types={["visit", "tour", "callback"]} /></div>
@@ -152,7 +152,7 @@ export default function PropertyPage() {
       )}
 
       <div className="lg:hidden fixed bottom-0 inset-x-0 z-30 bg-white border-t border-[#E5E1D8] p-3 flex gap-2" data-testid="mobile-sticky-cta">
-        <a href="#whatsapp" onClick={wa} className="h-12 w-12 rounded-md bg-[#1f7a4d] text-white flex items-center justify-center" aria-label="WhatsApp enquiry" data-testid="mobile-sticky-whatsapp"><MessageCircle className="w-5 h-5" /></a>
+        <a href="#whatsapp" onClick={wa} className="h-12 w-12 rounded-md bg-[#25D366] text-white flex items-center justify-center" aria-label="WhatsApp enquiry" data-testid="mobile-sticky-whatsapp"><WhatsAppIcon className="w-6 h-6" /></a>
         <button onClick={toForm} className="btn-dark h-12 rounded-md flex-1 font-medium" data-testid="mobile-request-visit">Request a visit</button>
       </div>
       <Lightbox imgs={imgs} index={lb} setIndex={setLb} title={p.title} />

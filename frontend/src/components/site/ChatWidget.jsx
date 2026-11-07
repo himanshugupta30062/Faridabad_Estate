@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { Sparkles, X, Send, MapPin, BedDouble, Headset } from "lucide-react";
 import { API, formatPrice, imageSrc } from "@/lib/api";
 
@@ -34,6 +34,7 @@ const Bubble = ({ m }) => (
 );
 
 export const ChatWidget = () => {
+  const onProperty = useLocation().pathname.startsWith("/property/");
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState([{ role: "assistant", content: GREETING }]);
   const [input, setInput] = useState("");
@@ -114,7 +115,7 @@ export const ChatWidget = () => {
   return (
     <>
       {!open && (
-        <button onClick={() => setOpen(true)} className="fixed bottom-20 lg:bottom-5 right-4 sm:right-5 z-50 btn-gold rounded-full px-4 sm:pl-4 sm:pr-5 h-12 sm:h-14 flex items-center gap-2 shadow-2xl font-medium" data-testid="chat-open-button">
+        <button onClick={() => setOpen(true)} className={`fixed ${onProperty ? "bottom-20" : "bottom-4"} lg:bottom-5 right-4 sm:right-5 z-50 btn-gold rounded-full px-4 sm:pl-4 sm:pr-5 h-12 sm:h-14 flex items-center gap-2 shadow-2xl font-medium`} data-testid="chat-open-button">
           <Sparkles className="w-5 h-5" /> <span className="hidden sm:inline">Ask Estate Mitra</span>
         </button>
       )}
