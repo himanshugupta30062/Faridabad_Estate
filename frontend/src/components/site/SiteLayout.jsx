@@ -22,7 +22,7 @@ const WhatsAppFab = () => {
   const onProperty = useLocation().pathname.startsWith("/property/");
   return (
   <button onClick={() => openWhatsApp(`Hi ${COMPANY.name}, I'm looking for a property in Faridabad. Please help me.`)} aria-label="Chat with us on WhatsApp"
-    className={`group fixed bottom-[76px] sm:bottom-[88px] lg:bottom-[92px] right-4 sm:right-5 z-50 w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-[#25D366] text-white ${onProperty ? "hidden lg:flex" : "flex"} items-center justify-center shadow-[0_10px_25px_-8px_rgba(37,211,102,0.7)] hover:bg-[#1ebe5b] hover:scale-105 transition-[transform,background-color] duration-200`} data-testid="whatsapp-fab">
+    className={`group fixed bottom-[76px] sm:bottom-[88px] lg:bottom-[92px] right-4 sm:right-5 z-50 w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-[#25D366] text-white ${onProperty ? "hidden lg:flex" : "flex"} items-center justify-center shadow-[0_6px_16px_-6px_rgba(0,0,0,0.35)] hover:bg-[#1ebe5b] hover:scale-105 transition-[transform,background-color] duration-200`} data-testid="whatsapp-fab">
     <span className="absolute inset-0 rounded-full bg-[#25D366] opacity-40 animate-ping [animation-duration:2.5s]" aria-hidden="true" />
     <WhatsAppIcon className="relative w-6 h-6 sm:w-7 sm:h-7" />
     <span className="pointer-events-none absolute right-full mr-3 whitespace-nowrap rounded-full bg-[#111114] text-white text-xs px-3 py-1.5 opacity-0 translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-[opacity,transform] duration-200 hidden sm:block">Chat on WhatsApp</span>

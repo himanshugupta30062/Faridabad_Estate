@@ -1,0 +1,33 @@
+{
+  "summary": "Frontend-only retest of header Saved vs Sign in separation, next-param redirect after login, and the collapsing Ask Estate Mitra FAB plus its placement next to the WhatsApp button. All requested items passed in Playwright on desktop (1920) and mobile (390).",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "Desktop footer area", "issues": ["WhatsApp FAB has a large dark shadow halo that looks like a dark circle where it overlaps the dark footer (cosmetic)"]}
+    ]
+  },
+  "verified": [
+    "Logged out: nav-saved href=/saved goes to saved-page-guest, with saved-guest-login, saved-guest-register and saved-guest-browse visible. No redirect to login.",
+    "nav-login href=/login?next=%2Fproperties on /properties opens login-page. Logging in as visitor@test.in returns to /properties and shows nav-logout.",
+    "Logged in: nav-saved shows saved-page (empty state)",
+    "saved-guest-login goes to /login?next=/saved. Logging in returns to /saved with saved-page.",
+    "Desktop chat-open-label is 116px wide with opacity 1 at 0-2s and collapses to 0 by 7s. Hover expands it and moving away collapses it. It reappeared at ~30.8s and collapsed by ~34.9s.",
+    "chat-open-button opens chat-panel on desktop and mobile",
+    "Mobile 390: label hidden (sm:inline-block), icon-only",
+    "WhatsApp FAB sits above the chat button with no overlap. Desktop: WA 932-988, chat 1004-1060. Mobile: WA 720-768, chat 780-828. On mobile property pages the WA FAB is hidden (the sticky bar has its own WhatsApp) and the chat button sits above the sticky bar."
+  ],
+  "test_report_links": [],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "SiteHeader loginTo uses only pathname, so query strings are lost (e.g. /properties?listing_type=rent returns to /properties without the filter). Consider pathname+search.",
+    "AccountAuth next validation uses next.startsWith('/'), which allows '//host' values. Prefer requiring '/' and not '//'."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "N/A (skipped)", "frontend": "100%"},
+  "seed_data_creation": "None; used existing visitor@test.in",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Iteration 3 verified header saved/sign-in separation, next redirects and chat FAB collapse timing (5s hide, 30s re-show for 4s). The WhatsApp flows were verified in iteration_2."
+}
