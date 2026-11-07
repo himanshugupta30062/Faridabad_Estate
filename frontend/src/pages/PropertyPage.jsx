@@ -22,7 +22,7 @@ const Lightbox = ({ imgs, index, setIndex, title }) => {
   }, [index, move]);
   return (
     <Dialog open={index !== null} onOpenChange={(o) => !o && setIndex(null)}>
-      <DialogContent className="max-w-none w-screen h-[100dvh] p-0 bg-black border-0 rounded-none flex items-center justify-center [&>button]:hidden" data-testid="gallery-lightbox">
+      <DialogContent className="max-w-none w-screen h-[100dvh] p-0 bg-black border-0 rounded-none flex items-center justify-center [&>button:not([data-testid^=lightbox])]:hidden" data-testid="gallery-lightbox">
         <DialogTitle className="sr-only">{title} photos</DialogTitle>
         {index !== null && <img src={imageSrc(imgs[index])} alt={`${title} photo ${index + 1}`} className="max-w-full max-h-full object-contain" />}
         <button onClick={() => setIndex(null)} aria-label="Close gallery" className="absolute top-4 right-4 w-11 h-11 rounded-full bg-white/10 text-white flex items-center justify-center" data-testid="lightbox-close"><X /></button>

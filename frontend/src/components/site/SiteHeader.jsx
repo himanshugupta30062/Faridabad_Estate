@@ -31,12 +31,12 @@ export const SiteHeader = () => {
   const compare = useLocalList(KEYS.compare);
   const { pathname } = useLocation();
   const loginTo = `/login?next=${encodeURIComponent(pathname === "/login" || pathname === "/register" ? "/" : pathname)}`;
-  const link = "text-sm text-[#2b2a27] hover:text-[#8a6d24] transition-colors";
+  const link = "text-sm whitespace-nowrap text-[#2b2a27] hover:text-[#8a6d24] transition-colors";
   return (
     <header className="sticky top-0 z-40 bg-[#FAF9F6]/95 backdrop-blur border-b border-[#E5E1D8]" data-testid="site-header">
       <div className="max-w-7xl mx-auto px-4 sm:px-8 lg:px-12 h-16 flex items-center justify-between gap-6">
         <Logo />
-        <nav className="hidden lg:flex items-center gap-7" aria-label="Main">
+        <nav className="hidden lg:flex items-center gap-5 xl:gap-7" aria-label="Main">
           {NAV.map((n) => <Link key={n.label} to={n.to} className={link} data-testid={`nav-${n.label.toLowerCase().replace(/\s/g, "-")}`}>{n.label}</Link>)}
         </nav>
         <div className="flex items-center gap-1 sm:gap-2">
@@ -46,12 +46,12 @@ export const SiteHeader = () => {
           </NavLink>
           <NavLink to="/saved" className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-[#F0ECE3]" aria-label="Saved properties" data-testid="nav-saved"><Heart className="w-[18px] h-[18px]" /></NavLink>
           {user ? (
-            <button onClick={logout} className="hidden sm:flex items-center gap-1.5 text-sm px-3 h-10 rounded-full hover:bg-[#F0ECE3]" data-testid="nav-logout"><User className="w-4 h-4" />{user.name?.split(" ")[0] || "Account"} · Sign out</button>
+            <button onClick={logout} className="hidden sm:flex items-center gap-1.5 text-sm px-3 h-10 rounded-full hover:bg-[#F0ECE3] whitespace-nowrap" data-testid="nav-logout" title="Sign out"><User className="w-4 h-4" /><span className="whitespace-nowrap">{user.name?.split(" ")[0] || "Account"} · Sign out</span></button>
           ) : (
             <Link to={loginTo} className="hidden sm:flex items-center gap-1.5 text-sm px-3 h-10 rounded-full hover:bg-[#F0ECE3]" data-testid="nav-login"><User className="w-4 h-4" />Sign in</Link>
           )}
           <Link to="/admin" className="hidden sm:flex items-center gap-1.5 text-sm px-3 h-10 rounded-full border border-[#DDD7CB] hover:bg-[#F0ECE3]" data-testid="nav-admin-link"><ShieldCheck className="w-4 h-4" />Admin</Link>
-          <button onClick={() => openChat()} className="hidden md:flex btn-dark rounded-full px-4 h-10 text-sm items-center gap-2" data-testid="nav-ask-ai-button"><Sparkles className="w-4 h-4 text-[#e3c77a]" />Ask Estate Mitra</button>
+          <button onClick={() => openChat()} className="hidden md:flex btn-dark rounded-full px-4 h-10 text-sm items-center gap-2 whitespace-nowrap" data-testid="nav-ask-ai-button"><Sparkles className="w-4 h-4 text-[#e3c77a]" />Ask Estate Mitra</button>
           <button className="lg:hidden w-10 h-10 flex items-center justify-center" onClick={() => setOpen(true)} aria-label="Open menu" data-testid="nav-mobile-toggle"><Menu /></button>
         </div>
       </div>

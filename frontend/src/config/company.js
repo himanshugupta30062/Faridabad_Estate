@@ -10,7 +10,7 @@ export const COMPANY = {
   phoneHref: "+918920785645",
   // Set REACT_APP_WHATSAPP_NUMBER (country code + number, digits only, e.g. 919812345678) in frontend/.env
   whatsapp: (process.env.REACT_APP_WHATSAPP_NUMBER || "").replace(/\D/g, ""),
-  email: "hello@urbannest.in",
+  email: "hello@faridabadestates.in",
   address: "Faridabad, Haryana",
   hours: "Mon – Sat, 10:00 AM – 7:00 PM",
   rera: "[RERA agent registration no. — to be added]",

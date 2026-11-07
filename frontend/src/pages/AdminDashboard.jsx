@@ -48,7 +48,7 @@ export default function AdminDashboard() {
       <header className="sticky top-0 z-40 backdrop-blur-md bg-[#0F0F12]/85 border-b border-white/10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <span className="w-9 h-9 rounded-sm border border-[#D4AF37]/60 flex items-center justify-center font-serif text-[#D4AF37]">U</span>
+            <span className="w-9 h-9 rounded-sm border border-[#D4AF37]/60 flex items-center justify-center font-serif text-[#D4AF37]">F</span>
             <div><p className="font-serif">Faridabad Estates Admin</p><p className="text-[11px] text-zinc-500">{user?.email}</p></div>
           </div>
           <div className="flex items-center gap-2">

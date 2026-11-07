@@ -1,0 +1,44 @@
+{
+  "summary": "Regression test after the code-review fixes (stats l->ld rename, chat sid moved to sessionStorage, stable React keys, ternary refactors). Backend: 7/7 pytest passed. Frontend: all requested flows passed in Playwright on desktop: admin overview panels, chat streaming and matches, restore after reload in the same tab and a fresh chat in a new tab, neighbourhood summaries, team and testimonials, card carousel, and the /saved guest, empty and saved states. The chat budget 10x bug is fixed: '1.5 crore' is stored as budget_max=15000000 in both the session and the lead. Found one pre-existing UI bug that does not come from these changes: the lightbox close, prev and next buttons are hidden.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [
+      {"component": "PropertyPage Lightbox", "issue": "DialogContent has className '[&>button]:hidden'. It is meant to hide the default shadcn X, but it also hides the custom lightbox-close, lightbox-prev and lightbox-next buttons (computed display:none). Users can only move between photos with the arrow keys and close with Esc or by clicking outside. On mobile there is no way to move to the next photo. Pre-existing (present before this change set). Fix: hide only the default close button, e.g. '[&>button:not([data-testid^=lightbox])]:hidden', or remove the rule and drop the custom close.", "selector": "[data-testid=lightbox-next], [data-testid=lightbox-prev], [data-testid=lightbox-close]", "priority": "HIGH"}
+    ],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "Site header (logged in visitor)", "issues": ["Nav items wrap onto 2 lines ('How it works', 'Test · Sign out', 'Ask Estate Mitra') at desktop width when the user name is shown. Add whitespace-nowrap or reduce the gaps."]},
+      {"screen": "Branding leftovers", "issues": ["Footer contact email is hello@urbannest.in", "Admin header logo letter is 'U' (UrbanNest) instead of 'F'", "Admin 'Most requested locations' shows Kondapur/Madhapur (Hyderabad) from old test leads (data, not code)"]},
+      {"screen": "Property imagery", "issues": ["'Sector 10 2 BHK Builder Floor' uses a tropical villa/resort render, which does not match a Faridabad builder floor"]}
+    ]
+  },
+  "verified": [
+    "Admin login -> GET /api/admin/stats 200. stat-total=10. panel-sources (Estate Mitra AI 5, Website forms 5), panel-recent, panel-followups and panel-property-performance render. Sources and status sums equal total. follow_ups are sorted and exclude Closed/Lost.",
+    "Chat: 'Find me a 3 BHK in Sector 15 under 1.5 crore' streams a reply and returns 1 card (Sector 15 3 BHK Builder Floor, ₹1.35 Cr) with reasons. requirements.budget_max=15000000. The lead created after sharing name and phone has budget_max=15000000.",
+    "The sid is stored in sessionStorage (localStorage is null). After a reload the conversation and card are restored. A new tab starts a fresh chat.",
+    "9 hood-cards show 'N listing(s) · from ₹X' with correct singular/plural, including the rent format '₹35,000/month'.",
+    "team-section (3 advisors) and testimonials-section render.",
+    "card-next and card-prev change the image without navigating away.",
+    "gallery-image-0 and gallery-view-all ('All 4 photos') open the lightbox. ArrowRight moves 1/4 -> 2/4 and Esc closes it.",
+    "/saved: logged out shows saved-page-guest. saved-guest-login goes to /login?next=/saved and back to /saved with saved-empty. Saving via fav-button shows the card on /saved. Un-saving shows saved-empty again.",
+    "No React duplicate-key warnings in the console."
+  ],
+  "test_report_links": ["/app/backend/tests/test_faridabad_v5_regression.py", "/app/test_reports/pytest/pytest_v5.xml"],
+  "action_items": [
+    "Fix the PropertyPage Lightbox '[&>button]:hidden' rule so the close, prev and next buttons are visible",
+    "Optional: stop the header nav items from wrapping when a visitor is logged in",
+    "Optional: replace the remaining urbannest branding (footer email, admin 'U' logo)"
+  ],
+  "critical_code_review_comments": [
+    "Gallery and carousel keys use the image URL (key={src}) and highlights use key={h}. If an admin uploads the same image twice, or two highlights have the same text, React gets duplicate keys. Use `${i}-${src}` or dedupe the images on save. No duplicates exist in the current data.",
+    "stats() still uses 'l' in the intents, temps and locs comprehensions/loops (lines 176-181), so the rename is only partial. This is cosmetic.",
+    "Recharts logs 'width(-1) and height(-1)' warnings on the admin overview. Give the ResponsiveContainer parents a min height/width.",
+    "Radix DialogContent warns about a missing Description/aria-describedby on the lightbox (accessibility)."
+  ],
+  "updated_files": ["/app/backend/tests/test_faridabad_v5_regression.py"],
+  "success_rate": {"backend": "100% (7/7)", "frontend": "95% (all requested flows pass; lightbox prev/next/close buttons hidden)"},
+  "seed_data_creation": "Chat test created 1 lead TEST_Ravi, which was deleted by id in teardown. Chat sessions from the tests remain in the DB. A visitor favourite was added and then removed.",
+  "retest_needed": false,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "Use test_faridabad_v5_regression.py for stats shape, chat budget extraction (it reads chat_sessions.requirements from Mongo) and lead budget. pytest.ini uses xdist, so run with python -m pytest without -p no:xdist. Visitor login submit testid is visitor-login-submit-button. Lightbox buttons are hidden by '[&>button]:hidden'; re-check after the fix."
+}
