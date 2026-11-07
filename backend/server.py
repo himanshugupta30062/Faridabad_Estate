@@ -57,7 +57,7 @@ async def ensure_indexes():
 app = FastAPI()
 api = APIRouter(prefix="/api")
 
-PropertyType = Literal["Apartment", "Villa", "Independent House", "Plot"]
+PropertyType = Literal["Apartment", "Builder Floor", "Independent House", "Villa", "Plot"]
 
 
 # ---------- Public listings ----------
@@ -121,7 +121,7 @@ async def create_enquiry(body: EnquiryIn):
     if not req.get("locations") and body.location:
         req["locations"] = [body.location]
     if not req.get("summary"):
-        req["summary"] = f"{body.name} submitted a website enquiry to {body.intent} in {body.location or 'Hyderabad'}."
+        req["summary"] = f"{body.name} submitted a website enquiry to {body.intent} in {body.location or 'Faridabad'}."
     matches = [public_property(prop)] if prop else []
     lead = build_lead_fields(req, matches)
     lead.update({"id": str(uuid.uuid4()), "source": "whatsapp" if body.enquiry_type == "whatsapp" else "website_form",
@@ -266,8 +266,8 @@ class PropertyIn(BaseModel):
     listing_type: Literal["buy", "rent"]
     location: str = Field(min_length=2, max_length=60)
     property_type: PropertyType
-    bedrooms: int = Field(ge=1, le=10)
-    bathrooms: int = Field(ge=1, le=10)
+    bedrooms: int = Field(ge=0, le=10)
+    bathrooms: int = Field(ge=0, le=10)
     area_sqft: int = Field(ge=100, le=100000)
     price: float = Field(gt=0)
     possession: Optional[Literal["Ready to move", "Under construction"]] = None

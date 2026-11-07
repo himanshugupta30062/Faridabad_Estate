@@ -18,11 +18,11 @@ export default function NeighbourhoodPage() {
   const hero = n.properties[0]?.images?.[0] || n.properties[0]?.image_url;
   return (
     <div data-testid="neighbourhood-page">
-      <Seo title={`Property in ${n.name}, Hyderabad — Homes for sale & rent | PropMitra`} description={`${n.intro} Browse ${n.listings} UrbanNest listings in ${n.name}.`} />
+      <Seo title={`Property in ${n.name}, Faridabad — Homes for sale & rent | PropMitra`} description={`${n.intro} Browse ${n.listings} UrbanNest listings in ${n.name}.`} />
       <section className="relative bg-[#111114] overflow-hidden">
         {hero && <img src={imageSrc(hero)} alt="" className="absolute inset-0 w-full h-full object-cover opacity-40" />}
         <div className="relative max-w-7xl mx-auto px-4 sm:px-8 lg:px-12 py-20 sm:py-28">
-          <p className="eyebrow !text-[#e3c77a]">Neighbourhood guide · Hyderabad</p>
+          <p className="eyebrow !text-[#e3c77a]">Neighbourhood guide · Faridabad</p>
           <h1 className="font-serif text-white text-4xl sm:text-6xl mt-4">{n.name}</h1>
           <p className="text-white/80 mt-5 max-w-xl text-lg">{n.intro}</p>
           <div className="flex flex-wrap gap-10 mt-10">

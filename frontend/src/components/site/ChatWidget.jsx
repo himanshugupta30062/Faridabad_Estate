@@ -4,7 +4,7 @@ import { Sparkles, X, Send, MapPin, BedDouble, Headset } from "lucide-react";
 import { API, formatPrice, imageSrc } from "@/lib/api";
 
 const SID_KEY = "propmitra_chat_sid";
-const GREETING = "Namaste! I'm Property Mitra, your AI property advisor from UrbanNest Properties. Are you looking to Buy, Rent or Sell a property in Hyderabad?";
+const GREETING = "Namaste! I'm Property Mitra, your AI property advisor from UrbanNest Properties. Are you looking to Buy, Rent or Sell a property in Faridabad?";
 
 const MiniCard = ({ p }) => (
   <Link to={`/property/${p.slug}`} className="flex gap-3 bg-[#0F0F12] border border-[#D4AF37]/30 hover:border-[#D4AF37] rounded-sm p-2 min-w-[260px] max-w-[280px]" data-testid={`chat-match-${p.id}`}>
@@ -14,10 +14,10 @@ const MiniCard = ({ p }) => (
       <p className="text-white text-xs truncate">{p.title}</p>
       <p className="text-zinc-500 text-[11px] flex items-center gap-2 mt-0.5">
         <span className="flex items-center gap-0.5"><MapPin className="w-3 h-3" />{p.location}</span>
-        <span className="flex items-center gap-0.5"><BedDouble className="w-3 h-3" />{p.bedrooms} BHK</span>
+        <span className="flex items-center gap-0.5"><BedDouble className="w-3 h-3" />{p.bedrooms ? `${p.bedrooms} BHK` : "Plot"}</span>
       </p>
       {p.reasons?.length > 0 && <p className="text-[10px] text-emerald-300/90 mt-1 leading-snug line-clamp-2">✓ {p.reasons.join(" · ")}</p>}
-      <p className="text-[9px] uppercase tracking-widest text-[#F3E5AB]/70 mt-0.5">{p.is_sample ? "Demo listing · " : ""}View details →</p>
+      <p className="text-[9px] uppercase tracking-widest text-[#F3E5AB]/70 mt-0.5">{p.is_sample ? "Sample · not verified · " : ""}View details →</p>
     </div>
   </Link>
 );
@@ -140,8 +140,8 @@ export const ChatWidget = () => {
             {messages.length === 1 && configured && (
               <div className="flex gap-2 flex-wrap">
                 {[["buy", "Buy", "I want to buy a property"], ["rent", "Rent", "I want to rent a property"], ["sell", "Sell", "I want to sell my property"],
-                  ["eg1", "3 BHK in Kondapur under ₹1.5 Cr", "Find me a 3 BHK in Kondapur under ₹1.5 crore."],
-                  ["eg2", "Rental under ₹35,000", "I need a rental apartment under ₹35,000."]].map(([k, t, m]) => (
+                  ["eg1", "3 BHK in Sector 15 under ₹1.5 Cr", "Find me a 3 BHK in Sector 15 under ₹1.5 crore."],
+                  ["eg2", "Rental near Sector 10 HBC", "I need a rental near Sector 10 HBC under ₹25,000."]].map(([k, t, m]) => (
                   <button key={k} onClick={() => send(m)} data-testid={`chat-quick-${k}`}
                     className="px-4 py-1.5 rounded-full border border-[#D4AF37]/50 text-[#F3E5AB] text-sm hover:bg-[#D4AF37]/10">{t}</button>
                 ))}

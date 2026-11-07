@@ -13,6 +13,8 @@ const BUDGETS = { buy: [["", "Any budget"], ["10000000", "Under ₹1 Cr"], ["150
 
 const HeroSearch = () => {
   const nav = useNavigate();
+  const [sugg, setSugg] = useState([]);
+  useEffect(() => { api.get("/search-meta").then((r) => setSugg(r.data.suggestions)).catch(() => {}); }, []);
   const [mode, setMode] = useState("buy");
   const [q, setQ] = useState("");
   const [type, setType] = useState("");
@@ -45,7 +47,8 @@ const HeroSearch = () => {
           <label className="col-span-2 md:col-span-1 relative">
             <span className="sr-only">Locality, project or keyword</span>
             <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[#8a8579]" />
-            <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Locality, project or keyword" className={`${sel} w-full pl-9`} data-testid="hero-search-input" />
+            <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Sector, colony or keyword (e.g. Sector 15)" list="hero-localities" className={`${sel} w-full pl-9`} data-testid="hero-search-input" />
+            <datalist id="hero-localities">{sugg.map((s) => <option key={s} value={s} />)}</datalist>
           </label>
           <select aria-label="Property type" value={type} onChange={(e) => setType(e.target.value)} className={sel} data-testid="hero-type-select">
             <option value="">Any type</option>{PROPERTY_TYPES.map((t) => <option key={t}>{t}</option>)}
@@ -78,22 +81,22 @@ export default function HomePage() {
   }, []);
   const count = (fn) => props.filter(fn).length;
   const collections = [
-    { title: "Gated villas", q: "property_type=Villa&listing_type=buy", n: count((p) => p.property_type === "Villa"), img: props.find((p) => p.property_type === "Villa")?.image_url },
+    { title: "Villas & independent houses", q: "property_type=Villa&listing_type=buy", n: count((p) => p.property_type === "Villa"), img: props.find((p) => p.property_type === "Villa")?.image_url, alt: "property_type=Independent+House" },
     { title: "Ready to move", q: "possession=Ready+to+move&listing_type=buy", n: count((p) => p.possession === "Ready to move" && p.listing_type === "buy"), img: props[1]?.images?.[1] },
-    { title: "Rentals near the IT corridor", q: "listing_type=rent", n: count((p) => p.listing_type === "rent"), img: props.find((p) => p.listing_type === "rent")?.image_url },
+    { title: "Homes for rent", q: "listing_type=rent", n: count((p) => p.listing_type === "rent"), img: props.find((p) => p.listing_type === "rent")?.image_url },
     { title: "Homes under ₹1 crore", q: "listing_type=buy&max_price=10000000", n: count((p) => p.listing_type === "buy" && p.price <= 10000000), img: props[0]?.images?.[1] },
   ];
 
   return (
     <>
-      <Seo title="PropMitra by UrbanNest Properties — Find a Home in Hyderabad" description="Discover apartments, villas and rentals across Hyderabad with PropMitra, the AI real estate advisor from UrbanNest Properties." />
+      <Seo title="PropMitra by UrbanNest Properties — Find a Home in Faridabad" description="Discover apartments, villas and rentals across Faridabad with PropMitra, the AI real estate advisor from UrbanNest Properties." />
       <section className="relative min-h-[88vh] flex items-end" data-testid="hero-section">
         <img src={HERO} alt="Contemporary home with a pool at dusk" className="absolute inset-0 w-full h-full object-cover" fetchpriority="high" />
         <div className="absolute inset-0 bg-gradient-to-t from-[#111114]/90 via-[#111114]/40 to-[#111114]/10" />
         <div className="relative w-full max-w-7xl mx-auto px-4 sm:px-8 lg:px-12 pb-12 sm:pb-16 pt-32">
           <p className="eyebrow !text-[#e3c77a] fade-up">{COMPANY.name} · {COMPANY.city}</p>
           <h1 className="font-serif text-white text-4xl sm:text-5xl lg:text-6xl font-medium leading-[1.08] mt-4 max-w-3xl fade-up" style={{ animationDelay: "80ms" }}>Find a Place You'll Love to Call Home.</h1>
-          <p className="text-white/80 text-base sm:text-lg mt-5 max-w-xl fade-up" style={{ animationDelay: "160ms" }}>Discover exceptional properties across Hyderabad with your personal AI real estate advisor.</p>
+          <p className="text-white/80 text-base sm:text-lg mt-5 max-w-xl fade-up" style={{ animationDelay: "160ms" }}>Discover exceptional properties across Faridabad with your personal AI real estate advisor.</p>
           <div className="flex flex-wrap gap-3 mt-8 fade-up" style={{ animationDelay: "220ms" }}>
             <Link to="/properties" className="btn-gold rounded-full h-12 px-6 font-medium flex items-center gap-2" data-testid="hero-explore-button">Explore Properties <ArrowRight className="w-4 h-4" /></Link>
             <button onClick={() => openChat()} className="rounded-full h-12 px-6 font-medium flex items-center gap-2 bg-white/10 text-white border border-white/30 hover:bg-white/20 transition-colors" data-testid="hero-chat-button"><Sparkles className="w-4 h-4 text-[#e3c77a]" />Talk to Property Mitra</button>
@@ -105,7 +108,7 @@ export default function HomePage() {
       <section className="max-w-7xl mx-auto px-4 sm:px-8 lg:px-12 py-14 grid md:grid-cols-3 gap-px bg-[#E5E1D8] border-y border-[#E5E1D8] md:border md:rounded-lg overflow-hidden" data-testid="entry-points">
         {[
           { icon: Home, t: "Buy a home", d: `${count((p) => p.listing_type === "buy")} homes for sale, from apartments to villas.`, to: "/properties?listing_type=buy", id: "buy" },
-          { icon: KeyRound, t: "Rent a home", d: `${count((p) => p.listing_type === "rent")} rentals close to Hyderabad's work hubs.`, to: "/properties?listing_type=rent", id: "rent" },
+          { icon: KeyRound, t: "Rent a home", d: `${count((p) => p.listing_type === "rent")} rentals across Faridabad's sectors and colonies.`, to: "/properties?listing_type=rent", id: "rent" },
           { icon: Tag, t: "Sell your property", d: "Tell us about your home and get a call from an advisor.", to: "/#sell", id: "sell" },
         ].map(({ icon: Icon, t, d, to, id }) => (
           <Link key={t} to={to} className="group bg-[#FAF9F6] p-8 hover:bg-white transition-colors" data-testid={`entry-${id}`}>
@@ -116,13 +119,13 @@ export default function HomePage() {
       </section>
 
       <section className="max-w-7xl mx-auto px-4 sm:px-8 lg:px-12 py-12 sm:py-16" data-testid="featured-section">
-        <Head eyebrow="Handpicked" title="Featured homes across West Hyderabad" action={<Link to="/properties" className="btn-line rounded-full px-5 h-10 text-sm flex items-center gap-2 self-start" data-testid="featured-view-all">View all properties <ArrowRight className="w-4 h-4" /></Link>} />
+        <Head eyebrow="Handpicked" title="Featured homes across Faridabad" action={<Link to="/properties" className="btn-line rounded-full px-5 h-10 text-sm flex items-center gap-2 self-start" data-testid="featured-view-all">View all properties <ArrowRight className="w-4 h-4" /></Link>} />
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">{props.slice(0, 6).map((p) => <ListingCard key={p.id} p={p} />)}</div>
       </section>
 
       <section id="neighbourhoods" className="bg-[#F4F1EA] py-16 sm:py-24 scroll-mt-16" data-testid="neighbourhoods-section">
         <div className="max-w-7xl mx-auto px-4 sm:px-8 lg:px-12">
-          <Head eyebrow="Neighbourhoods" title="Popular places to live in Hyderabad" />
+          <Head eyebrow="Neighbourhoods" title="Popular places to live in Faridabad" />
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
             {hoods.map((n, i) => (
               <Link key={n.slug} to={`/neighbourhoods/${n.slug}`} className={`group relative rounded-lg overflow-hidden bg-[#16161a] ${i === 0 ? "lg:col-span-2 lg:row-span-2 aspect-square lg:aspect-auto" : "aspect-[4/5]"}`} data-testid={`hood-card-${n.slug}`}>
@@ -176,7 +179,7 @@ export default function HomePage() {
           <p className="eyebrow">Why {COMPANY.name}</p>
           <h2 className="font-serif text-3xl sm:text-4xl mt-3">Local knowledge, honest information, personal follow-up.</h2>
           <ul className="mt-8 space-y-5 text-[#2b2a27]">
-            {["Advice focused on West Hyderabad's key residential corridors.", "Listing details come only from our records — nothing invented.", "One advisor stays with you from first call to site visit."].map((t) => (
+            {["Advice focused on Faridabad's established sectors and new growth corridors.", "Listing details come only from our records — nothing invented.", "One advisor stays with you from first call to site visit."].map((t) => (
               <li key={t} className="flex gap-3"><span className="w-1.5 h-1.5 rounded-full bg-[#c9a54c] mt-2.5 shrink-0" />{t}</li>
             ))}
           </ul>
@@ -209,7 +212,7 @@ export default function HomePage() {
                 </tr>))}</tbody>
             </table>
           </div>
-          <p className="text-xs text-[#8a8579] mt-3">Calculated live from active UrbanNest listings (currently demo data). Not an official market index.</p>
+          <p className="text-xs text-[#8a8579] mt-3">Calculated live from active UrbanNest SAMPLE listings with illustrative prices. Not an official market index or actual inventory.</p>
         </div>
       </section>
 

@@ -15,7 +15,7 @@ export default function SavedPage() {
   const active = (items || []).filter((p) => p.is_active && ids.includes(p.id));
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-8 lg:px-12 py-12" data-testid="saved-page">
-      <Seo title="Saved homes | PropMitra" description="Your saved Hyderabad properties." />
+      <Seo title="Saved homes | PropMitra" description="Your saved Faridabad properties." />
       <h1 className="font-serif text-4xl">Saved homes</h1>
       {items === null ? <p className="text-[#55524D] mt-6">Loading…</p> : active.length ? (
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">{active.map((p) => <ListingCard key={p.id} p={p} />)}</div>

@@ -6,14 +6,14 @@ import { ChatWidget } from "./ChatWidget";
 import { COMPANY } from "@/config/company";
 import { useLocalList, KEYS, clearCompare } from "@/lib/local";
 
-const NEIGH = [["gachibowli", "Gachibowli"], ["kondapur", "Kondapur"], ["kokapet", "Kokapet"], ["financial-district", "Financial District"], ["tellapur", "Tellapur"], ["narsingi", "Narsingi"]];
+const NEIGH = [["sector-10-hbc", "Sector 10 HBC"], ["sectors-14-17", "Sectors 14–17"], ["sectors-21c-21d", "Sectors 21C & 21D"], ["sainik-colony", "Sainik Colony"], ["charmwood-village", "Charmwood Village"], ["greater-faridabad", "Greater Faridabad"]];
 
 const SiteFooter = () => (
   <footer className="bg-[#111114] text-white/70" data-testid="site-footer">
     <div className="max-w-7xl mx-auto px-4 sm:px-8 lg:px-12 py-14 grid gap-10 md:grid-cols-[1.4fr_1fr_1fr_1.2fr]">
       <div>
         <Logo light />
-        <p className="text-sm mt-5 max-w-xs leading-relaxed">AI-assisted property advisory for buyers, tenants and sellers across Hyderabad.</p>
+        <p className="text-sm mt-5 max-w-xs leading-relaxed">AI-assisted property advisory for buyers, tenants and sellers across Faridabad.</p>
         <p className="text-xs mt-5 text-white/40">{COMPANY.rera}<br />{COMPANY.registration}</p>
       </div>
       <div>
@@ -42,7 +42,7 @@ const SiteFooter = () => (
     </div>
     <div className="border-t border-white/10">
       <div className="max-w-7xl mx-auto px-4 sm:px-8 lg:px-12 py-6 text-xs text-white/40 flex flex-col md:flex-row gap-2 justify-between">
-        <p>© {new Date().getFullYear()} {COMPANY.name}. Listings marked “Demo” are sample data for demonstration only and are not available for transactions.</p>
+        <p>© {new Date().getFullYear()} {COMPANY.name}. Listings marked “Sample” are illustrative demo data — not verified, not actual inventory and not available for transactions.</p>
         <p>{COMPANY.placeholderNote} <Link to="/admin" className="underline hover:text-white">Admin</Link></p>
       </div>
     </div>

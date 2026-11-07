@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { BedDouble, Bath, Maximize, ChevronLeft, ChevronRight, MapPin } from "lucide-react";
-import { formatPrice, imageSrc } from "@/lib/api";
+import { formatPrice, imageSrc, configLabel } from "@/lib/api";
 import { FavButton, CompareButton, ShareButton } from "./PropertyActions";
 
 export const DemoBadge = ({ className = "" }) => (
-  <span className={`text-[10px] uppercase tracking-[0.18em] px-2 py-1 rounded-sm bg-[#FAF9F6]/95 text-[#6b5419] font-semibold ${className}`}>Demo listing</span>
+  <span className={`text-[10px] uppercase tracking-[0.18em] px-2 py-1 rounded-sm bg-[#FAF9F6]/95 text-[#6b5419] font-semibold ${className}`} title="Sample listing — not verified or available">Sample · not verified</span>
 );
 
 const Carousel = ({ p }) => {
@@ -51,11 +51,11 @@ export const ListingCard = ({ p, layout = "grid", active, onHover }) => {
           </div>
         </div>
         <h3 className="text-[15px] font-medium text-[#111114] mt-1">{p.title}</h3>
-        <p className="flex items-center gap-1 text-sm text-[#55524D] mt-1"><MapPin className="w-3.5 h-3.5" />{p.location}, Hyderabad · {p.property_type}</p>
+        <p className="flex items-center gap-1 text-sm text-[#55524D] mt-1"><MapPin className="w-3.5 h-3.5" />{p.location}, Faridabad · {p.property_type}</p>
         {list && <p className="text-sm text-[#55524D] mt-3 line-clamp-2">{p.description}</p>}
         <div className="flex gap-4 mt-auto pt-4 text-sm text-[#2b2a27]">
-          <span className="flex items-center gap-1.5"><BedDouble className="w-4 h-4 text-[#8a8579]" />{p.bedrooms} BHK</span>
-          <span className="flex items-center gap-1.5"><Bath className="w-4 h-4 text-[#8a8579]" />{p.bathrooms} bath</span>
+          <span className="flex items-center gap-1.5"><BedDouble className="w-4 h-4 text-[#8a8579]" />{configLabel(p)}</span>
+          {p.bathrooms > 0 && <span className="flex items-center gap-1.5"><Bath className="w-4 h-4 text-[#8a8579]" />{p.bathrooms} bath</span>}
           <span className="flex items-center gap-1.5"><Maximize className="w-4 h-4 text-[#8a8579]" />{p.area_sqft?.toLocaleString("en-IN")} sq.ft</span>
         </div>
         <span className="mt-4 pt-4 border-t border-[#EFEBE3] text-sm font-medium text-[#8a6d24] group-hover:text-[#111114] transition-colors">View details & enquire →</span>

@@ -63,7 +63,8 @@ export const BUDGETS = {
   ],
 };
 
-export const PROPERTY_TYPES = ["Apartment", "Villa", "Independent House", "Plot"];
+export const PROPERTY_TYPES = ["Apartment", "Builder Floor", "Independent House", "Villa", "Plot"];
+export const configLabel = (p) => (p.property_type === "Plot" || !p.bedrooms ? "Plot" : `${p.bedrooms} BHK`);
 
 export function openChat(message) {
   window.dispatchEvent(new CustomEvent("propmitra:chat", { detail: { message } }));

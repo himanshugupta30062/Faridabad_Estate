@@ -7,13 +7,34 @@ from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from fastapi.responses import Response
 
 from auth import get_current_user
-from catalog import NEIGHBOURHOODS
+from math import cos, radians
+
+from catalog import NEIGHBOURHOODS, SEARCH_CENTER
 from chat import public_property
 from db import db
 
 router = APIRouter(prefix="/api")
 SORTS = {"price_asc": [("price", 1)], "price_desc": [("price", -1)], "newest": [("created_at", -1)],
          "relevance": [("order", 1), ("created_at", -1)]}
+
+
+def _dist(d):
+    if d.get("latitude") is None:
+        return 999.0
+    dy, dx = d["latitude"] - SEARCH_CENTER[0], (d["longitude"] - SEARCH_CENTER[1]) * cos(radians(SEARCH_CENTER[0]))
+    return (dx * dx + dy * dy) ** 0.5
+
+
+def _in(locs):
+    return {"$in": locs}
+
+
+@router.get("/search-meta")
+async def search_meta():
+    locs = await db.properties.distinct("location", {"is_active": True})
+    areas = sorted({*locs, *[n["name"] for n in NEIGHBOURHOODS]})
+    return {"center": {"name": "Sector 10 HBC, Faridabad", "lat": SEARCH_CENTER[0], "lng": SEARCH_CENTER[1]}, "suggestions": areas,
+            "groups": [{"name": n["name"], "localities": n["localities"]} for n in NEIGHBOURHOODS]}
 
 
 def _rx(s):
@@ -50,11 +71,12 @@ async def search(q: Optional[str] = Query(None, max_length=80), listing_type: Op
         if lo is not None or hi is not None:
             f[key] = {**({"$gte": lo} if lo is not None else {}), **({"$lte": hi} if hi is not None else {})}
     if q and q.strip():
-        f["$or"] = [{k: _rx(q)} for k in ["title", "location", "description", "property_type"]]
+        group = next((n for n in NEIGHBOURHOODS if n["name"].lower() == q.strip().lower()), None)
+        f["$or"] = [{"location": _in(group["localities"])}] if group else [{k: _rx(q)} for k in ["title", "location", "description", "property_type"]]
     docs = await db.properties.find(f, {"_id": 0}).sort(SORTS[sort]).to_list(limit)
-    if q and q.strip() and sort == "relevance":
-        ql = q.strip().lower()
-        docs.sort(key=lambda d: -(3 * (ql in d["location"].lower()) + 2 * (ql in d["title"].lower())))
+    if sort == "relevance":
+        ql = (q or "").strip().lower()
+        docs.sort(key=lambda d: (-(3 * (ql in d["location"].lower()) + 2 * (ql in d["title"].lower())) if ql else 0, _dist(d)))
     return [public_property(d) for d in docs]
 
 
@@ -90,7 +112,7 @@ def _insight(name, props):
     buys = [p for p in props if p["listing_type"] == "buy"]
     rents = [p for p in props if p["listing_type"] == "rent"]
     return {"location": name, "listings": len(props),
-            "avg_price_per_sqft": round(mean(p["price"] / p["area_sqft"] for p in buys)) if buys else None,
+            "avg_price_per_sqft": round(mean(p["price"] / p["area_sqft"] for p in buys if p["property_type"] != "Plot")) if any(p["property_type"] != "Plot" for p in buys) else None,
             "min_buy_price": min((p["price"] for p in buys), default=None),
             "min_rent": min((p["price"] for p in rents), default=None),
             "types": sorted({p["property_type"] for p in props})}
@@ -112,7 +134,7 @@ async def neighbourhoods():
                                                            "area_sqft": 1, "property_type": 1, "image_url": 1}).to_list(1000)
     out = []
     for n in NEIGHBOURHOODS:
-        mine = [p for p in props if p["location"].lower() == n["name"].lower()]
+        mine = [p for p in props if p["location"] in n["localities"]]
         out.append({**n, **_insight(n["name"], mine), "image_url": mine[0]["image_url"] if mine else None})
     return out
 
@@ -122,8 +144,7 @@ async def neighbourhood(slug: str):
     n = next((x for x in NEIGHBOURHOODS if x["slug"] == slug), None)
     if not n:
         raise HTTPException(status_code=404, detail="Neighbourhood not found")
-    props = await db.properties.find({"is_active": True, "location": {"$regex": f"^{re.escape(n['name'])}$", "$options": "i"}},
-                                     {"_id": 0}).to_list(100)
+    props = await db.properties.find({"is_active": True, "location": _in(n["localities"])}, {"_id": 0}).to_list(100)
     return {**n, **_insight(n["name"], props), "properties": [public_property(p) for p in props]}
 
 

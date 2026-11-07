@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { BedDouble, Bath, Maximize, MapPin, CalendarClock, Sofa, Images, ChevronLeft, ChevronRight, X, MessageCircle, Sparkles, Phone, Info } from "lucide-react";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
-import { api, formatApiError, formatPrice, imageSrc, openChat } from "@/lib/api";
+import { api, formatApiError, formatPrice, imageSrc, openChat, configLabel } from "@/lib/api";
 import { pushRecent } from "@/lib/local";
 import { COMPANY, AGENT } from "@/config/company";
 import { FavButton, CompareButton, ShareButton } from "@/components/site/PropertyActions";
@@ -67,12 +67,12 @@ export default function PropertyPage() {
   const url = `${window.location.origin}/property/${p.slug}`;
   const wa = `https://wa.me/${COMPANY.whatsapp}?text=${encodeURIComponent(`Hi UrbanNest, I'm interested in ${p.title} (${price}, ${p.location}). Ref: ${p.id.slice(0, 8)} ${url}`)}`;
   const jsonLd = { "@context": "https://schema.org", "@type": "RealEstateListing", name: p.title, description: p.description, url, image: imgs.slice(0, 4).map(imageSrc),
-    offers: { "@type": "Offer", price: p.price, priceCurrency: "INR" }, address: { "@type": "PostalAddress", addressLocality: `${p.location}, Hyderabad`, addressRegion: "Telangana", addressCountry: "IN" } };
+    offers: { "@type": "Offer", price: p.price, priceCurrency: "INR" }, address: { "@type": "PostalAddress", addressLocality: `${p.location}, Faridabad`, addressRegion: "Haryana", addressCountry: "IN" } };
   const toForm = () => document.getElementById("enquire")?.scrollIntoView({ behavior: "smooth" });
 
   return (
     <article className="pb-24 lg:pb-0" data-testid="property-page">
-      <Seo title={`${p.title}, ${p.location} — ${price} | PropMitra`} description={`${p.bedrooms} BHK ${p.property_type.toLowerCase()} ${p.listing_type === "rent" ? "for rent" : "for sale"} in ${p.location}, Hyderabad. ${p.area_sqft} sq.ft. ${p.description.slice(0, 110)}`} jsonLd={jsonLd} />
+      <Seo title={`${p.title}, ${p.location} — ${price} | PropMitra`} description={`SAMPLE ${p.property_type === "Plot" ? "" : configLabel(p) + " "}${p.property_type.toLowerCase()} ${p.listing_type === "rent" ? "for rent" : "for sale"} in ${p.location}, Faridabad. ${p.area_sqft} sq.ft. ${p.description.slice(0, 110)}`} jsonLd={jsonLd} />
       <div className="max-w-7xl mx-auto px-4 sm:px-8 lg:px-12 pt-6">
         <nav aria-label="Breadcrumb" className="text-xs text-[#8a8579]"><Link to="/" className="hover:underline">Home</Link> / <Link to={`/properties?listing_type=${p.listing_type}`} className="hover:underline">{p.listing_type === "rent" ? "Rent" : "Buy"}</Link> / {p.location}</nav>
         <div className="grid grid-cols-4 grid-rows-2 gap-2 mt-4 h-[42vh] sm:h-[58vh] rounded-xl overflow-hidden" data-testid="property-gallery">
@@ -92,19 +92,19 @@ export default function PropertyPage() {
         <div>
           <p className="eyebrow">{p.listing_type === "rent" ? "For rent" : "For sale"} · {p.property_type}</p>
           <h1 className="font-serif text-3xl sm:text-5xl mt-3" data-testid="property-title">{p.title}</h1>
-          <p className="flex items-center gap-1.5 text-[#55524D] mt-3"><MapPin className="w-4 h-4" />{p.location}, Hyderabad</p>
+          <p className="flex items-center gap-1.5 text-[#55524D] mt-3"><MapPin className="w-4 h-4" />{p.location}, Faridabad</p>
           <p className="font-serif text-4xl mt-6" data-testid="property-price">{price}</p>
-          {p.listing_type === "buy" && <p className="text-sm text-[#8a8579] mt-1">₹{Math.round(p.price / p.area_sqft).toLocaleString("en-IN")} per sq.ft</p>}
+          {p.listing_type === "buy" && p.property_type !== "Plot" && <p className="text-sm text-[#8a8579] mt-1">₹{Math.round(p.price / p.area_sqft).toLocaleString("en-IN")} per sq.ft</p>}
           <div className="flex flex-wrap gap-2 mt-6">
             <FavButton id={p.id} label className="btn-line h-10 px-4" />
             <ShareButton p={p} label className="btn-line h-10 px-4" />
             <CompareButton id={p.id} label className="btn-line h-10 px-4" />
           </div>
-          {p.is_sample && <p className="mt-6 flex gap-2 text-sm bg-[#F4F1EA] border border-[#E5E1D8] rounded-lg p-4 text-[#55524D]" data-testid="demo-notice"><Info className="w-4 h-4 mt-0.5 shrink-0" />This is a demo listing for illustration. It is not verified and not available for any transaction.</p>}
+          {p.is_sample && <p className="mt-6 flex gap-2 text-sm bg-[#F4F1EA] border border-[#E5E1D8] rounded-lg p-4 text-[#55524D]" data-testid="demo-notice"><Info className="w-4 h-4 mt-0.5 shrink-0" />SAMPLE listing with illustrative details and price. It is not verified, not actual inventory and not available for any transaction.</p>}
 
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-8 mt-8">
-            <Spec icon={BedDouble} label="Configuration" value={`${p.bedrooms} BHK`} />
-            <Spec icon={Bath} label="Bathrooms" value={p.bathrooms} />
+            <Spec icon={BedDouble} label="Configuration" value={configLabel(p)} />
+            {p.bathrooms > 0 && <Spec icon={Bath} label="Bathrooms" value={p.bathrooms} />}
             <Spec icon={Maximize} label="Area" value={`${p.area_sqft.toLocaleString("en-IN")} sq.ft`} />
             {p.furnishing && <Spec icon={Sofa} label="Furnishing" value={p.furnishing} />}
             {p.possession && <Spec icon={CalendarClock} label="Possession" value={p.possession} />}

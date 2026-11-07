@@ -4,12 +4,12 @@ const U = "https://images.unsplash.com/photo-";
 export const COMPANY = {
   name: "UrbanNest Properties",
   product: "PropMitra",
-  city: "Hyderabad",
+  city: "Faridabad",
   phoneDisplay: "+91 90000 00000",
   phoneHref: "+919000000000",
   whatsapp: "919000000000",
   email: "hello@urbannest.in",
-  address: "[Office address — to be added], Hyderabad, Telangana",
+  address: "Faridabad, Haryana",
   hours: "Mon – Sat, 10:00 AM – 7:00 PM",
   rera: "[RERA agent registration no. — to be added]",
   registration: "[Company registration no. — to be added]",
@@ -23,9 +23,9 @@ export const TEAM = [
 ];
 
 export const TESTIMONIALS = [
-  { name: "Demo client", role: "Buyer · Kondapur", text: "The assistant asked exactly the right questions and an advisor called the same evening." },
-  { name: "Demo client", role: "Tenant · Financial District", text: "I relocated from Pune and needed a rental fast. They shortlisted options within my budget." },
-  { name: "Demo client", role: "Villa buyer · Tellapur", text: "Clear information, no pressure and genuinely helpful follow-up." },
+  { name: "Demo client", role: "Buyer · Sector 15", text: "The assistant asked exactly the right questions and an advisor called the same evening." },
+  { name: "Demo client", role: "Tenant · Greater Faridabad", text: "I relocated from Noida and needed a rental fast. They shortlisted options within my budget." },
+  { name: "Demo client", role: "House buyer · Sector 21C", text: "Clear information, no pressure and genuinely helpful follow-up." },
 ];
 
 export const AGENT = { name: "UrbanNest advisory desk", role: "Your UrbanNest property advisor", img: TEAM[0].img };

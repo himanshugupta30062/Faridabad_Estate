@@ -25,8 +25,8 @@ function validate(f) {
   if (f.title.trim().length < 3) e.title = "Title is required";
   if (f.location.trim().length < 2) e.location = "Location is required";
   if (!(+f.price > 0)) e.price = "Enter a valid price";
-  if (!(+f.bedrooms >= 1)) e.bedrooms = "Required";
-  if (!(+f.bathrooms >= 1)) e.bathrooms = "Required";
+  if (f.property_type !== "Plot" && !(+f.bedrooms >= 1)) e.bedrooms = "Required";
+  if (f.property_type !== "Plot" && !(+f.bathrooms >= 1)) e.bathrooms = "Required";
   if (!(+f.area_sqft >= 100)) e.area_sqft = "Min 100 sq.ft";
   if (!f.images.length) e.images = "Add at least one image link or upload a photo";
   if ((f.latitude === "") !== (f.longitude === "")) e.latitude = "Enter both latitude and longitude, or neither";
@@ -110,7 +110,7 @@ export const ListingForm = ({ open, listing, onClose, onSaved }) => {
               <SelectContent>{PROPERTY_TYPES.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent>
             </Select>
           </L>
-          <L label="Location (locality)" error={errors.location}><Input value={f.location} onChange={set("location")} placeholder="e.g. Gachibowli" className={cls} data-testid="listing-location-input" /></L>
+          <L label="Location (locality)" error={errors.location}><Input value={f.location} onChange={set("location")} placeholder="e.g. Sector 15 or Sainik Colony" className={cls} data-testid="listing-location-input" /></L>
           <L label={f.listing_type === "rent" ? "Monthly rent (₹)" : "Price (₹)"} error={errors.price}><Input type="number" value={f.price} onChange={set("price")} placeholder={f.listing_type === "rent" ? "28000" : "8500000"} className={cls} data-testid="listing-price-input" /></L>
           <L label="Bedrooms" error={errors.bedrooms}><Input type="number" value={f.bedrooms} onChange={set("bedrooms")} className={cls} data-testid="listing-bedrooms-input" /></L>
           <L label="Bathrooms" error={errors.bathrooms}><Input type="number" value={f.bathrooms} onChange={set("bathrooms")} className={cls} data-testid="listing-bathrooms-input" /></L>

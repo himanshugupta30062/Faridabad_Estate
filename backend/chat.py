@@ -58,23 +58,23 @@ def budget_label(req):
     return ""
 
 
-EXTRACT_SYSTEM = """You extract structured real estate requirements from a chat between a visitor and Property Mitra (UrbanNest Properties, Hyderabad).
+EXTRACT_SYSTEM = """You extract structured real estate requirements from a chat between a visitor and Property Mitra (UrbanNest Properties, Faridabad, Haryana).
 Return ONLY a JSON object, no prose, with keys:
 intent: "buy" | "rent" | "sell" | null
-locations: array of Hyderabad locality names the visitor wants (or owns, for sell), Title Case, e.g. ["Gachibowli"], or []
+locations: array of Faridabad locality names the visitor wants (or owns, for sell), Title Case, e.g. ["Sector 15"] or ["Sainik Colony"], or []
 budget_min: number in INR or null; budget_max: number in INR or null. For rent use monthly rent. Convert lakh (1e5) and crore (1e7). "around X" => min 0.85X, max 1.15X. "under X" => max X. For sell, use expected price as budget_max.
-property_type: "Apartment" | "Villa" | "Independent House" | "Plot" | null (flat => Apartment)
+property_type: "Apartment" | "Builder Floor" | "Independent House" | "Villa" | "Plot" | null (flat/society => Apartment, floor => Builder Floor, kothi/house => Independent House)
 bedrooms: integer or null
 possession: "Ready to move" | "Under construction" | "Any" | null
 name: string or null; phone: string or null (exactly as visitor typed)
 handoff: true if the visitor asks to talk to a human, agent, advisor or a real person, else false
 temperature: "Hot" | "Warm" | "Cold". Hot = clear intent, budget and location given, shares contact and wants to proceed soon (site visit, ready to move, urgent). Warm = some requirements clear but undecided or no urgency. Cold = vague, just browsing, or refuses details.
 summary: 2-3 short sentences summarising the visitor's requirement and stage for a sales advisor. Only facts stated by the visitor.
-Locations: map Hyderabad spellings/abbreviations to the standard locality name (e.g. "FD", "Fin District" => "Financial District", "Hitech city" => "HITEC City"). "near X" => ["X"].
+Locations: use Faridabad locality names exactly in this style: "Sector 10 HBC", "Sector 9", "Sector 15", "Sector 21C", "NIT", "Sainik Colony", "Greenfield Colony", "Charmwood Village", "Sector 82". "sec 15"/"sector-15" => "Sector 15"; "HBC"/"Housing Board Colony" => "Sector 10 HBC"; "Sectors 14 to 17" => ["Sector 14","Sector 15","Sector 16","Sector 17"]; "Greater Faridabad" or "new sectors" => ["Sector 75", ..., "Sector 89"] (all 15); "near X" => ["X"]. If the visitor just says "Faridabad" or "anywhere", use [].
 Intent: if the visitor gives a monthly amount or says rent/rental/lease => "rent"; if they mention lakh/crore purchase budget or buying => "buy"; if they want to sell/list their property => "sell".
 Only use what the visitor actually said. Never guess."""
 
-REPLY_RULES = """You are Property Mitra, the friendly AI property advisor of UrbanNest Properties, a real estate consultancy in Hyderabad.
+REPLY_RULES = """You are Property Mitra, the friendly AI property advisor of UrbanNest Properties, a real estate consultancy in Faridabad, Haryana.
 Goal: understand the visitor's requirement, recommend matching listings, and collect their name and phone for a callback.
 Conversation flow (ask at most 1-2 things per message, keep replies under 90 words, warm Indian English, use lakh/crore):
 1. Ask if they want to Buy, Rent or Sell.
@@ -202,7 +202,7 @@ class ChatIn(BaseModel):
 
 
 GREETING = ("Namaste! I'm Property Mitra, your AI property advisor from UrbanNest Properties. "
-            "Are you looking to Buy, Rent or Sell a property in Hyderabad?")
+            "Are you looking to Buy, Rent or Sell a property in Faridabad?")
 
 
 @router.get("/chat/status")

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { X } from "lucide-react";
-import { api, formatPrice, imageSrc } from "@/lib/api";
+import { api, formatPrice, imageSrc, configLabel } from "@/lib/api";
 import { useLocalList, KEYS, toggleCompare } from "@/lib/local";
 import { Seo } from "@/components/site/Seo";
 
@@ -10,10 +10,10 @@ const ROWS = [
   ["Listing", (p) => (p.listing_type === "rent" ? "For rent" : "For sale")],
   ["Locality", (p) => p.location],
   ["Type", (p) => p.property_type],
-  ["Configuration", (p) => `${p.bedrooms} BHK`],
+  ["Configuration", (p) => configLabel(p)],
   ["Bathrooms", (p) => p.bathrooms],
   ["Area", (p) => `${p.area_sqft.toLocaleString("en-IN")} sq.ft`],
-  ["Price / sq.ft", (p) => (p.listing_type === "buy" ? `₹${Math.round(p.price / p.area_sqft).toLocaleString("en-IN")}` : "—")],
+  ["Price / sq.ft", (p) => (p.listing_type === "buy" && p.property_type !== "Plot" ? `₹${Math.round(p.price / p.area_sqft).toLocaleString("en-IN")}` : "—")],
   ["Furnishing", (p) => p.furnishing || "Not specified"],
   ["Possession", (p) => p.possession || "Not specified"],
 ];
@@ -27,7 +27,7 @@ export default function ComparePage() {
   }, [ids]);
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-8 lg:px-12 py-12" data-testid="compare-page">
-      <Seo title="Compare properties | PropMitra" description="Compare up to three Hyderabad properties side by side." />
+      <Seo title="Compare properties | PropMitra" description="Compare up to three Faridabad properties side by side." />
       <h1 className="font-serif text-4xl">Compare homes</h1>
       {!items.length ? (
         <div className="border border-dashed border-[#D8D2C4] rounded-xl p-10 text-center mt-8" data-testid="compare-empty">

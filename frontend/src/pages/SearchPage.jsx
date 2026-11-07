@@ -49,6 +49,8 @@ export default function SearchPage() {
   const [recent, setRecent] = useState([]);
   const [q, setQ] = useState(sp.get("q") || "");
   const recentIds = useLocalList(KEYS.recent);
+  const [meta, setMeta] = useState({ suggestions: [], center: null });
+  useEffect(() => { api.get("/search-meta").then((r) => setMeta(r.data)).catch(() => {}); }, []);
   const lt = sp.get("listing_type") || "buy";
   const view = sp.get("view") || "grid";
   const sort = sp.get("sort") || "relevance";
@@ -69,11 +71,11 @@ export default function SearchPage() {
   const clear = () => { setQ(""); setSp(new URLSearchParams({ listing_type: lt }), { replace: true }); };
   const submitQ = (e) => { e.preventDefault(); set("q", q.trim()); };
   const selectFromMap = (p) => { setActive(p.id); document.querySelector(`[data-testid="listing-card-${p.id}"]`)?.scrollIntoView({ behavior: "smooth", block: "center" }); };
-  const title = `${lt === "rent" ? "Homes for rent" : "Homes for sale"} in Hyderabad`;
+  const title = `${lt === "rent" ? "Homes for rent" : "Homes for sale"} in Faridabad`;
 
   return (
     <div data-testid="search-page">
-      <Seo title={`${title} | PropMitra`} description={`Browse ${items.length} ${lt === "rent" ? "rental" : "sale"} listings across Hyderabad with filters for price, BHK, area and possession.`} />
+      <Seo title={`${title} | PropMitra`} description={`Browse ${items.length} ${lt === "rent" ? "rental" : "sale"} listings across Faridabad with filters for price, BHK, area and possession.`} />
       <div className="sticky top-16 z-30 bg-[#FAF9F6]/95 backdrop-blur border-b border-[#E5E1D8]">
         <div className="max-w-7xl mx-auto px-4 sm:px-8 lg:px-12 py-3 flex flex-wrap items-center gap-2">
           <div className="flex bg-[#F0ECE3] rounded-full p-1" role="tablist">
@@ -82,7 +84,8 @@ export default function SearchPage() {
           <form onSubmit={submitQ} className="relative flex-1 min-w-[180px]">
             <label className="sr-only" htmlFor="kw">Search by locality, project or keyword</label>
             <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[#8a8579]" />
-            <input id="kw" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Locality, project or keyword" className="w-full h-10 rounded-full border border-[#DDD7CB] bg-white pl-9 pr-3 text-sm outline-none focus:ring-2 focus:ring-[#c9a54c]" data-testid="search-keyword-input" />
+            <input id="kw" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Sector, colony or keyword (e.g. Sector 15)" list="search-localities" className="w-full h-10 rounded-full border border-[#DDD7CB] bg-white pl-9 pr-3 text-sm outline-none focus:ring-2 focus:ring-[#c9a54c]" data-testid="search-keyword-input" />
+            <datalist id="search-localities">{meta.suggestions.map((s) => <option key={s} value={s} />)}</datalist>
           </form>
           <button onClick={() => setOpen(true)} className="btn-line rounded-full h-10 px-4 text-sm flex items-center gap-2" data-testid="search-filters-button"><SlidersHorizontal className="w-4 h-4" />Filters{activeCount > 0 && <span className="w-5 h-5 rounded-full bg-[#c9a54c] text-[11px] font-semibold flex items-center justify-center">{activeCount}</span>}</button>
           <select aria-label="Sort" value={sort} onChange={(e) => set("sort", e.target.value === "relevance" ? "" : e.target.value)} className="h-10 rounded-full border border-[#DDD7CB] bg-white px-3 text-sm" data-testid="search-sort-select">
@@ -98,7 +101,10 @@ export default function SearchPage() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-8 lg:px-12 py-8">
         <div className="flex flex-wrap items-baseline justify-between gap-2 mb-6">
-          <h1 className="font-serif text-3xl sm:text-4xl">{title}</h1>
+          <div>
+            <h1 className="font-serif text-3xl sm:text-4xl">{title}</h1>
+            {sort === "relevance" && !sp.get("q") && meta.center && <p className="text-xs text-[#8a8579] mt-1" data-testid="search-center-note">Sorted by distance from {meta.center.name} · all of Faridabad searchable</p>}
+          </div>
           <p className="text-sm text-[#55524D]" data-testid="results-count" aria-live="polite">{loading ? "Searching…" : `${items.length} ${items.length === 1 ? "property" : "properties"}`}{(activeCount > 0 || sp.get("q")) && <button onClick={clear} className="ml-3 underline" data-testid="clear-filters-button">Clear filters</button>}</p>
         </div>
         {error && <p className="text-red-600" role="alert" data-testid="search-error">{error}</p>}
